@@ -9,3 +9,5 @@
 https://mp.weixin.qq.com/s/mBOeahnJxuhEA85aubgmUQ
 
 https://mp.weixin.qq.com/s/C2PsQGPu4CFIQAUGhb6HSw
+
+主控板是ardiuno uno
