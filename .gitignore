@@ -1,0 +1,10 @@
+# Local API samples and credentials
+apis/
+
+# Runtime secrets
+.env
+.env.local
+.env.*.local
+
+# Generated artifacts
+output/

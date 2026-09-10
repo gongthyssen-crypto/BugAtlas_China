@@ -2,7 +2,7 @@
 
 > 副标题：AI 驱动的城乡青少年本土昆虫观察与交流平台
 >
-> 文档版本：v0.2
+> 文档版本：v0.3
 >
 > 状态：MVP 基线
 >
@@ -643,12 +643,12 @@ Arduino CLI 1.5.1 和 AVR Core 1.8.8 为本文编写时的稳定基线。依赖�
 
 #### Kimi 多模态分析
 
-按用户提供的 Anthropic Messages 兼容格式接入，不在代码中写死服务商地址或模型名。环境变量：
+按用户提供的 Anthropic Messages 兼容格式接入。已取得本地接口配置，但密钥不得写入业务代码、PRD、日志或 Git；运行时通过环境变量注入：
 
 ```text
-KIMI_ANTHROPIC_BASE_URL=https://由用户提供的兼容服务地址
+KIMI_ANTHROPIC_BASE_URL=https://api.kimi.com/coding
 KIMI_ANTHROPIC_API_KEY=仅保存在本地环境中
-KIMI_ANTHROPIC_MODEL=由用户提供的视觉模型名
+KIMI_ANTHROPIC_MODEL=k3
 KIMI_ANTHROPIC_AUTH_MODE=x-api-key
 ```
 
@@ -685,10 +685,10 @@ KIMI_ANTHROPIC_AUTH_MODE=x-api-key
 
 #### GPT Image 2 兼容生图
 
-使用 OpenAI Images API 兼容格式，默认模型名为 `gpt-image-2`。如果用户的兼容网关使用 `image-2` 等别名，只通过环境变量覆盖模型名，不修改业务代码。
+使用用户提供的 OpenAI Images API 兼容网关和 `gpt-image-2` 模型。密钥仍只通过环境变量注入：
 
 ```text
-IMAGE_API_BASE_URL=https://api.openai.com
+IMAGE_API_BASE_URL=https://s.lconai.com
 IMAGE_API_KEY=仅保存在本地环境中
 IMAGE_MODEL=gpt-image-2
 ```
@@ -701,11 +701,21 @@ IMAGE_MODEL=gpt-image-2
   "prompt": "生成无文字、科学插画风格的昆虫候选示意图；不得添加标签、标题或中文字符。",
   "size": "1024x1024",
   "quality": "medium",
-  "output_format": "png"
+  "n": 1,
+  "response_format": "b64_json"
 }
 ```
 
-适配器优先读取 `data[0].b64_json`，解码并保存 PNG。若兼容服务返回 URL，服务端下载并校验 MIME、尺寸和文件大小后再保存。生图接入属于 Must，但生成结果不参与物种判断，并永久标注“AI 艺术化示意图”；接口失败时，明信片和详解图必须自动回退到原始照片。
+这份请求字段以用户提供的兼容脚本为准，其中返回格式字段为 `response_format`。适配器优先读取 `data[0].b64_json`，解码并保存 PNG；若兼容服务返回 URL，服务端下载并校验 MIME、尺寸和文件大小后再保存。网关还提供 `POST /v1/images/edits` 的 multipart 改图能力，V1 不依赖它，后续可用于风格化原始观察照片。
+
+生图接入属于 Must，但生成结果不参与物种判断，并永久标注“AI 艺术化示意图”；接口失败时，明信片和详解图必须自动回退到原始照片。
+
+#### 凭据管理
+
+- `apis/` 中的本地材料包含真实凭据，仅作为开发机配置来源，整个目录加入 `.gitignore`。
+- 后端启动时将凭据读入进程环境；小程序端永远不得接触、保存或打印上游 API 密钥。
+- 错误日志只记录服务名、HTTP 状态码、request ID 和脱敏后的错误摘要。
+- 禁止把完整请求头、Base64 图片或密钥写入日志；对外演示前检查 Git 历史和控制台输出。
 
 #### 无密钥 TTS
 
@@ -984,18 +994,17 @@ bugatlas/v1/stations/{stationId}/acks/config
 1. 主控板为 Arduino UNO R3。
 2. 温湿度使用 DHT11。
 3. 光照使用裸光敏电阻和 10 kΩ 分压，不使用光敏模块。
-4. 多模态模型使用 Kimi，按用户现有服务的 Anthropic Messages 兼容格式接入。
-5. 生图使用 GPT Image 2 兼容格式，默认模型名 `gpt-image-2`。
+4. 多模态模型使用 Kimi，服务地址为 `https://api.kimi.com/coding`，模型名为 `k3`，按 Anthropic Messages 兼容格式接入。
+5. 生图使用 `https://s.lconai.com` 的 GPT Image 2 兼容接口，模型名为 `gpt-image-2`。
 6. TTS 暂无密钥，MVP 使用 Windows 本地 SAPI 中文语音。
 7. 小程序使用微信开发者工具测试号，仅在电脑模拟器运行。
 8. 交流平台为本机演示，不部署公网，不支持真实跨校用户登录。
 
-### 18.2 实施时通过环境变量补充
+### 18.2 实施时验证或补充
 
-1. Kimi Anthropic 兼容服务的 base URL、API key 和实际视觉模型名。
-2. GPT Image 2 兼容服务的 base URL、API key，以及服务端使用 `gpt-image-2` 还是 `image-2` 别名。
-3. UNO 的 USB 串口芯片型号；桥接服务应通过串口枚举兼容 ATmega16U2 和 CH340G，无需提前锁定。
-4. 明信片视觉方向；本文基线为横版 1600×1000，详解图为竖版 1080×1920。
+1. 首次联调时分别进行一次 Kimi 图片消息和 GPT Image 2 生图请求，确认认证头、返回字段和额度状态；PRD 阶段不主动消耗接口额度。
+2. UNO 的 USB 串口芯片型号；桥接服务应通过串口枚举兼容 ATmega16U2 和 CH340G，无需提前锁定。
+3. 明信片视觉方向；本文基线为横版 1600×1000，详解图为竖版 1080×1920。
 
 ## 19. 版本决策摘要
 
