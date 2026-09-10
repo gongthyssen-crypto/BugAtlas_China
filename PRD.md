@@ -2,7 +2,7 @@
 
 > 副标题：AI 驱动的城乡青少年本土昆虫观察与交流平台
 >
-> 文档版本：v0.1
+> 文档版本：v0.2
 >
 > 状态：MVP 基线
 >
@@ -32,7 +32,8 @@
 4. 使用多模态 AI 输出候选物种、判断依据、不确定性和继续观察建议。
 5. 生成可导出的自然明信片 PNG 和博物详解图 PNG。
 6. 将明信片发布到本地“自然中国”交流平台，支持按地区和学校浏览。
-7. 在外部 AI 服务不可用时，仍能使用演示模式完成端到端流程。
+7. 多模态分析使用 Kimi 的 Anthropic Messages 兼容格式；无文字插画使用 GPT Image 2 兼容格式。
+8. TTS 在当前 Windows 演示机上使用无需密钥的本地语音，外部 AI 服务不可用时仍能使用演示模式完成端到端流程。
 
 ### 2.3 MVP 成功标准
 
@@ -120,12 +121,13 @@
 | M-06 | 文字描述 | 输入颜色、大小、行为、发现位置等信息 | 描述可为空；有描述时随 AI 请求提交 |
 | M-07 | AI 辅助识别 | 输出最多 3 个候选及证据、不确定性、验证建议 | 结果不使用“确定识别”；失败后记录保持为待分析 |
 | M-08 | 儿童版和教师版讲解 | 同一结果提供两种表述层级 | 页面可切换；教师版包含不确定性与观察方法 |
-| M-09 | TTS 语音讲解 | 将儿童版讲解生成音频并播放 | 可播放、暂停和重播；失败时保留文字并提示原因 |
+| M-09 | TTS 语音讲解 | 使用 Windows SAPI 将儿童版讲解生成 WAV 并播放 | 无需密钥；可播放、暂停和重播；失败时保留文字并提示原因 |
 | M-10 | 博物详解图 | 生成 1080×1920 PNG | 原图、候选名称、证据、环境数据和免责声明完整可读 |
 | M-11 | 自然明信片 | 生成 1600×1000 PNG | 生成时间不超过 5 秒；可预览并在电脑输出目录找到文件 |
 | M-12 | 交流广场 | 发布并浏览明信片 | 发布后刷新可见；本地服务重启后数据仍存在 |
 | M-13 | 地区与场景标签 | 记录地区、学校别名及山地/湿地/农田/校园场景 | 可按地区或场景筛选，不公开精确经纬度 |
 | M-14 | 演示模式 | 无 Arduino 或无 AI 时走预置流程 | 状态栏持续显示“演示模式”；不混入真实统计 |
+| M-15 | GPT Image 2 博物插画 | 按 OpenAI Images API 兼容格式生成无文字插画 | 保存为 PNG、标注 AI 示意图且不参与识别；失败时回退原始照片 |
 
 ### 5.2 Should
 
@@ -143,7 +145,7 @@
 
 | 编号 | 功能 | 描述 |
 | --- | --- | --- |
-| C-01 | AI 博物插画 | 生成不含文字的艺术化昆虫插画，再由模板叠加文字 |
+| C-01 | 插画风格切换 | 在博物铜版画、儿童手账和自然水彩之间切换，均不生成文字 |
 | C-02 | 明信片模板切换 | 博物版、儿童手账版、山水邮票版 |
 | C-03 | 评论与点赞 | 仅限预置身份和教师审核的演示交互 |
 | C-04 | 全国自然年鉴 | 按月份、地区和场景汇总观察记录 |
@@ -157,7 +159,7 @@ flowchart LR
     subgraph Device[Arduino 设备层]
         UNO[Arduino UNO R3]
         DHT[DHT11]
-        LDR[GL5528 光敏模块]
+        LDR[GL5528 裸光敏电阻与 10 kΩ 分压]
         PIR[HC-SR501 可选]
         DHT --> UNO
         LDR --> UNO
@@ -183,10 +185,10 @@ flowchart LR
     end
 
     subgraph AI[AI 适配层]
-        Vision[多模态分析]
+        Vision[Kimi Anthropic 多模态分析]
         ASR[语音转写]
-        TTS[TTS]
-        Text[课程与文案生成]
+        TTS[Windows SAPI 本地 TTS]
+        Text[GPT Image 2 无文字插画]
     end
 
     UNO -->|USB CDC 115200 bps| Serial
@@ -205,15 +207,15 @@ flowchart LR
 
 | 类别 | 型号或规格 | 数量 | 优先级 | 电气说明 | 用途 |
 | --- | --- | ---: | --- | --- | --- |
-| 主控板 | Arduino UNO R3，ATmega328P-AU，16 MHz | 1 | Must | 5 V 逻辑，USB 供电 | 采集和协议封装 |
-| 温湿度 | DHT11 三针模块 | 1 | Must | VCC 3.3–5 V，数据线 5 V 逻辑 | 温湿度采集 |
-| 光照 | KY-018 或 GL5528 模拟光敏模块 | 1 | Must | VCC 5 V，AO 输出 0–5 V | 相对光照采集，不作为照度计 |
+| 主控板 | Arduino UNO R3，ATmega328P-AU，16 MHz | 1 | Must，已确认 | 5 V 逻辑，USB 供电 | 采集和协议封装 |
+| 温湿度 | DHT11（三针模块或四针裸器件） | 1 | Must，已确认 | VCC 3.3–5 V；裸器件 DATA 需外接 10 kΩ 上拉 | 温湿度采集 |
+| 光照 | GL5528 裸光敏电阻或同规格光敏电阻 | 1 | Must，已确认使用裸器件 | 与 10 kΩ 电阻组成 5 V 分压 | 相对光照采集，不作为照度计 |
 | 人体感应 | HC-SR501 | 1 | Should | VCC 5 V，OUT 高电平约 3.3 V | 检测人员靠近，不检测昆虫 |
 | 状态灯 | UNO 板载 LED | 1 | Must | D13 板载 | 心跳和错误提示 |
 | 连接线 | USB Type-B 数据线 | 1 | Must | 同时供电和通信 | 连接电脑 |
 | 面包板与杜邦线 | 常规规格 | 1 套 | Must | 注意公共地 | 连接模块 |
 | 上拉电阻 | 10 kΩ | 1 | 条件 Must | 裸 DHT11 必须；三针模块通常自带 | DHT 数据线上拉 |
-| 分压电阻 | 10 kΩ | 1 | 条件 Must | 裸 GL5528 必须；模块通常自带 | 形成光敏分压 |
+| 分压电阻 | 10 kΩ，1/4 W，±5% 或更好 | 1 | Must | A0 到 GND | 与裸光敏电阻形成分压 |
 | 演示电脑 | Windows 10/11 x64 | 1 | Must | 可运行微信开发者工具和 Node.js | 边缘网关与小程序模拟器 |
 
 ### 7.2 通信模块选择
@@ -242,15 +244,17 @@ flowchart LR
 | 5V | DHT11 | VCC | 5 V | 电源输出 | 裸传感器 DATA 到 5V 需 10 kΩ 上拉 |
 | GND | DHT11 | GND | 0 V | 电源 | 公共地 |
 | D2 | DHT11 | DATA | 5 V 数字 | 双向单总线 | 不与 UART 共用 |
-| 5V | KY-018/GL5528 模块 | VCC | 5 V | 电源输出 | 若为裸光敏电阻，使用 10 kΩ 分压 |
-| GND | KY-018/GL5528 模块 | GND | 0 V | 电源 | 公共地 |
-| A0 | KY-018/GL5528 模块 | AO | 0–5 V 模拟 | 输入 | ADC 10 位，范围 0–1023 |
+| 5V | 裸光敏电阻 | 一端 | 5 V | 分压输入 | 另一端接 A0；无正负极 |
+| A0 | 裸光敏电阻与 10 kΩ 电阻 | 分压中点 | 0–5 V 模拟 | 输入 | ADC 10 位，范围 0–1023 |
+| GND | 10 kΩ 分压电阻 | 一端 | 0 V | 分压参考 | 电阻另一端接 A0；此接法下越亮原始值越高 |
 | 5V | HC-SR501 | VCC | 5 V | 电源输出 | Should 功能 |
 | GND | HC-SR501 | GND | 0 V | 电源 | 公共地 |
 | D3 | HC-SR501 | OUT | 高电平约 3.3 V | 输入 | UNO 可识别；仅检测人员靠近 |
 | D13 | 板载 LED | LED_BUILTIN | 5 V 数字 | 输出 | 慢闪正常，快闪异常 |
 | D0/RX | USB 串口 | 板载桥接芯片 | 5 V TTL 内部 | 输入 | 保留，禁止外接其他模块 |
 | D1/TX | USB 串口 | 板载桥接芯片 | 5 V TTL 内部 | 输出 | 保留，禁止外接其他模块 |
+
+DHT11 若为四针裸器件，按传感器正面栅格朝向自己时，从左到右通常为 `VCC、DATA、NC、GND`，`NC` 不接；接线前仍须以实物丝印或购买页数据手册为准。若为三针模块，则直接按模块 `+ / OUT(S) / -` 丝印连接，通常无需再加外部上拉电阻。
 
 ### 8.2 预留引脚
 
@@ -269,7 +273,7 @@ flowchart LR
 - A0 输入不得超过 5 V，不得接负电压。
 - 风扇和马达不得直接连接 Arduino GPIO 或 5V 引脚。
 - 接线或更换模块前必须断开 USB。
-- 光敏模块只输出相对光照。未校准前，产品不得显示“lux”。
+- 裸光敏电阻只输出相对光照。未校准前，产品不得显示“lux”。固定接法为 `5V → 光敏电阻 → A0 → 10 kΩ → GND`，因此环境越亮，A0 原始值通常越高。
 
 ## 9. 设备通信协议
 
@@ -471,7 +475,7 @@ flowchart TD
 
 - 固件传输温度使用 0.1℃ 的有符号整数；REST 和数据库使用 `temperatureC` 浮点数。
 - 固件传输湿度使用 0.1%RH 的无符号整数；REST 和数据库使用 `humidityPct` 浮点数。
-- 光敏模块未校准，只保存 `lightRaw` 0–1023 和校准后的相对百分比，不使用 lux。
+- 裸光敏电阻分压电路未校准，只保存 `lightRaw` 0–1023 和校准后的相对百分比，不使用 lux。
 - 固件只提供 `uptimeMs`。绝对时间由桥接服务收到有效帧时生成。
 - API 时间统一使用带时区的 ISO 8601，例如 `2026-09-09T17:26:00+08:00`。
 - 串口多字节字段使用 little-endian；网络 JSON 不涉及大小端。
@@ -527,8 +531,8 @@ flowchart TD
 ```json
 {
   "observationId": "018f2f2b-7c5e-7b23-a5ef-19eeb3e0e011",
-  "modelProvider": "configured-provider",
-  "modelName": "configured-multimodal-model",
+  "modelProvider": "kimi-anthropic",
+  "modelName": "configured-kimi-vision-model",
   "promptVersion": "insect-analysis-v1",
   "candidates": [
     {
@@ -628,11 +632,92 @@ Arduino CLI 1.5.1 和 AVR Core 1.8.8 为本文编写时的稳定基线。依赖�
 | 平台 | 微信原生小程序 WXML/WXSS/JavaScript |
 | 微信开发者工具 | 2.02.0，当前机器已检测 |
 | 运行目标 | Windows 开发者工具模拟器 |
+| AppID | 使用微信开发者工具测试号，不申请正式发布 |
 | 网络设置 | 开发阶段允许不校验合法域名，访问 `127.0.0.1:3050` |
 | 图片输入 | 模拟器使用本地文件选择；真机保留 `wx.chooseMedia` 拍照能力 |
 | 录音 | `wx.getRecorderManager`，必须提供文字输入降级 |
 | 音频播放 | `wx.createInnerAudioContext` |
 | 画布 | Canvas 2D 仅用于预览；最终 PNG 由后端模板生成以保证一致性 |
+
+### 12.4 AI、图片与 TTS 适配器
+
+#### Kimi 多模态分析
+
+按用户提供的 Anthropic Messages 兼容格式接入，不在代码中写死服务商地址或模型名。环境变量：
+
+```text
+KIMI_ANTHROPIC_BASE_URL=https://由用户提供的兼容服务地址
+KIMI_ANTHROPIC_API_KEY=仅保存在本地环境中
+KIMI_ANTHROPIC_MODEL=由用户提供的视觉模型名
+KIMI_ANTHROPIC_AUTH_MODE=x-api-key
+```
+
+默认请求为 `POST {KIMI_ANTHROPIC_BASE_URL}/v1/messages`，使用 `x-api-key` 和 `anthropic-version: 2023-06-01` 请求头。若兼容服务要求 Bearer Token，可将 `KIMI_ANTHROPIC_AUTH_MODE` 改为 `bearer`。图片使用 Anthropic 内容块格式：
+
+```json
+{
+  "model": "${KIMI_ANTHROPIC_MODEL}",
+  "max_tokens": 1800,
+  "system": "你是谨慎的儿童博物教育助手，只输出符合给定 JSON Schema 的数据。",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "media_type": "image/jpeg",
+            "data": "${BASE64_IMAGE_DATA}"
+          }
+        },
+        {
+          "type": "text",
+          "text": "${OBSERVATION_CONTEXT_AND_SENSOR_SNAPSHOT}"
+        }
+      ]
+    }
+  ]
+}
+```
+
+服务端必须将返回文本解析并校验为 AIAnalysis。Kimi 仅负责候选分析和文字内容，不直接生成最终中文海报。
+
+#### GPT Image 2 兼容生图
+
+使用 OpenAI Images API 兼容格式，默认模型名为 `gpt-image-2`。如果用户的兼容网关使用 `image-2` 等别名，只通过环境变量覆盖模型名，不修改业务代码。
+
+```text
+IMAGE_API_BASE_URL=https://api.openai.com
+IMAGE_API_KEY=仅保存在本地环境中
+IMAGE_MODEL=gpt-image-2
+```
+
+默认请求为 `POST {IMAGE_API_BASE_URL}/v1/images/generations`：
+
+```json
+{
+  "model": "${IMAGE_MODEL}",
+  "prompt": "生成无文字、科学插画风格的昆虫候选示意图；不得添加标签、标题或中文字符。",
+  "size": "1024x1024",
+  "quality": "medium",
+  "output_format": "png"
+}
+```
+
+适配器优先读取 `data[0].b64_json`，解码并保存 PNG。若兼容服务返回 URL，服务端下载并校验 MIME、尺寸和文件大小后再保存。生图接入属于 Must，但生成结果不参与物种判断，并永久标注“AI 艺术化示意图”；接口失败时，明信片和详解图必须自动回退到原始照片。
+
+#### 无密钥 TTS
+
+MVP 采用 Windows 本地 SAPI，无需 API 密钥和外网。当前演示机已检测到中文语音 `Microsoft Huihui`、`Microsoft Kangkang` 和 `Microsoft Yaoyao`，默认使用更适合儿童讲解的 `Microsoft Yaoyao`。
+
+```text
+TTS_PROVIDER=windows-sapi
+TTS_VOICE=Microsoft Yaoyao
+TTS_OUTPUT=wav-pcm-16k-mono
+```
+
+本地服务调用 Windows `System.Speech.Synthesis.SpeechSynthesizer`，输出 16 kHz、16 bit、单声道 PCM WAV，并按 `SHA-256(voice + rate + text)` 缓存。若默认声音不可用，依次回退到 `Microsoft Huihui` 和 `Microsoft Kangkang`。生产环境如需更自然的声音，再接入火山引擎、腾讯云或 Azure Speech 的正式 TTS 适配器；这些服务不属于 MVP，且需要单独密钥和费用评估。
 
 ## 13. 云端与 APP 接口
 
@@ -716,16 +801,17 @@ Arduino CLI 1.5.1 和 AVR Core 1.8.8 为本文编写时的稳定基线。依赖�
 | GET | `/jobs/:jobId` | 查询异步任务 | queued/running/succeeded/failed |
 | GET | `/observations/:id/analysis` | 获取完整 AI 结果 | AIAnalysis |
 | POST | `/observations/:id/tts` | 生成指定版本语音 | 202 + jobId |
-| GET | `/audio/:artifactId` | 播放 TTS 文件 | audio/mpeg 或 audio/wav |
+| GET | `/audio/:artifactId` | 播放 TTS 文件 | MVP 为 audio/wav |
 | POST | `/comparisons/questions` | 生成两地对照问题 | 课程问题列表 |
 
 TTS 请求：
 
 ```json
 {
-  "voiceProfile": "child_friendly_zh_cn",
+  "provider": "windows-sapi",
+  "voiceProfile": "Microsoft Yaoyao",
   "textSource": "childExplanation",
-  "speed": 0.95
+  "rate": 0
 }
 ```
 
@@ -733,6 +819,7 @@ TTS 请求：
 
 | 方法 | 路径 | 用途 | 返回 |
 | --- | --- | --- | --- |
+| POST | `/observations/:id/illustrations` | 调用 GPT Image 2 兼容接口生成无文字插画 | 202 + jobId |
 | POST | `/observations/:id/artifacts` | 生成明信片或详解图 | 201 + Artifact |
 | GET | `/artifacts/:id` | 获取文件元数据 | Artifact |
 | GET | `/artifacts/:id/file` | 下载或预览 PNG | image/png |
@@ -815,7 +902,7 @@ bugatlas/v1/stations/{stationId}/acks/config
 | 观察站首页 | 设备连接、实时环境、数据来源状态、新建观察 | PIR 人员靠近提示、历史小趋势 |
 | 发现昆虫 | 图片选择、文字描述、地点和场景 | 录音、ASR、拍摄指导轮廓 |
 | AI 博物导师 | 候选列表、证据、不确定性、继续观察建议 | 儿童版/教师版切换、对比卡 |
-| 明信片工坊 | 两种 PNG 生成、预览和导出 | 模板切换、AI 无文字插画 |
+| 明信片工坊 | 两种 PNG 生成、GPT Image 2 无文字插画、预览和导出 | 模板与插画风格切换 |
 | 自然中国 | 交流广场、地区和场景筛选、发布 | 地图、城乡对照问题、自然年鉴 |
 | 演示设置 | 串口选择、实时/演示模式、AI 适配器状态 | 协议日志、错误计数、重试按钮 |
 
@@ -827,6 +914,7 @@ bugatlas/v1/stations/{stationId}/acks/config
 - 小程序首页显示最新数据不超过 5 秒。
 - 模板图片生成不超过 5 秒。
 - AI 分析目标不超过 30 秒，硬超时 45 秒。
+- GPT Image 2 插画生成目标不超过 90 秒，硬超时 120 秒；相同输入和风格优先命中缓存。
 - TTS 目标不超过 10 秒，硬超时 20 秒。
 
 ### 16.2 稳定性
@@ -869,6 +957,7 @@ bugatlas/v1/stations/{stationId}/acks/config
 - [ ] AI 返回最多 3 个候选和可核验的判断依据。
 - [ ] AI 服务失败时观察记录不丢失。
 - [ ] 儿童版讲解可通过 TTS 播放。
+- [ ] GPT Image 2 兼容接口能生成并保存无文字 PNG，页面显示“AI 艺术化示意图”。
 - [ ] 所有 AI 结果包含辅助分析免责声明。
 
 ### 17.3 图片与交流平台
@@ -888,22 +977,34 @@ bugatlas/v1/stations/{stationId}/acks/config
 - [ ] Arduino 不在场时可以使用模拟传感器数据。
 - [ ] 操作员能在一个设置页确认串口、AI、TTS 和数据库状态。
 
-## 18. 实施前待确认项
+## 18. 已确认项与剩余参数
 
-以下问题不阻塞 PRD，但会影响具体实现：
+### 18.1 已确认
 
-1. 实物是否确认为 Arduino UNO R3；USB 串口芯片是 ATmega16U2、CH340G 还是其他兼容芯片。
-2. 温湿度器件是否为 DHT11 模块；光照器件是 KY-018 模块还是裸 GL5528 光敏电阻。
-3. 是否已有可调用的多模态视觉、ASR 和 TTS API 及密钥；若没有，演示版默认使用可替换适配器和本地示例。
-4. 是否已有微信小程序 AppID；若没有，使用开发者工具测试号完成模拟器演示。
-5. 交流平台是否只需本机演示；本文默认不部署公网，也不支持真实跨校用户登录。
-6. 明信片默认视觉方向；本文暂定横版 1600×1000，详解图暂定竖版 1080×1920。
+1. 主控板为 Arduino UNO R3。
+2. 温湿度使用 DHT11。
+3. 光照使用裸光敏电阻和 10 kΩ 分压，不使用光敏模块。
+4. 多模态模型使用 Kimi，按用户现有服务的 Anthropic Messages 兼容格式接入。
+5. 生图使用 GPT Image 2 兼容格式，默认模型名 `gpt-image-2`。
+6. TTS 暂无密钥，MVP 使用 Windows 本地 SAPI 中文语音。
+7. 小程序使用微信开发者工具测试号，仅在电脑模拟器运行。
+8. 交流平台为本机演示，不部署公网，不支持真实跨校用户登录。
+
+### 18.2 实施时通过环境变量补充
+
+1. Kimi Anthropic 兼容服务的 base URL、API key 和实际视觉模型名。
+2. GPT Image 2 兼容服务的 base URL、API key，以及服务端使用 `gpt-image-2` 还是 `image-2` 别名。
+3. UNO 的 USB 串口芯片型号；桥接服务应通过串口枚举兼容 ATmega16U2 和 CH340G，无需提前锁定。
+4. 明信片视觉方向；本文基线为横版 1600×1000，详解图为竖版 1080×1920。
 
 ## 19. 版本决策摘要
 
 - V1 选择 Arduino UNO R3 + USB 串口，不使用额外无线通信模块。
+- 传感器确定为 DHT11 和裸光敏电阻分压电路。
 - 手机摄像头位于应用层；模拟器使用本地图片选择作为等价输入。
-- AI 是辅助识别与课程生成器，不是权威鉴定工具。
+- Kimi Anthropic 兼容适配器负责辅助识别与课程文字生成，不是权威鉴定工具。
+- GPT Image 2 兼容适配器只生成无文字艺术化插画，不参与物种判断。
+- TTS 使用本机 Windows SAPI 和 `Microsoft Yaoyao`，无需密钥或联网。
 - 原始照片和结构化文字分层处理；中文由模板绘制，不交给图像模型生成。
 - “自然中国”在 V1 是本地交流演示平台，后续才扩展为公网城乡协作系统。
 - 风扇、马达和 PIR 不承担昆虫识别；PIR 仅可用于人员靠近提示。
