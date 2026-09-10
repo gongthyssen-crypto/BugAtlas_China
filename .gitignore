@@ -1,6 +1,6 @@
-# Local API samples and credentials
+# Local product materials, field research, and credentials
 apis/
-materials/private/
+materials/
 
 # Runtime secrets
 .env
