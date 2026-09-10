@@ -18,7 +18,14 @@ pnpm install
 pnpm start
 ```
 
-服务默认监听 `http://127.0.0.1:3050`，首次启动自动进入带永久标识的演示模式。打开微信开发者工具，导入仓库根目录并选择“测试号”；项目配置会将小程序源码指向 `miniprogram/`，仓库不硬编码个人 AppID。在“发现昆虫”页可使用“一键载入演示观察”完整走通分析、语音、制图与发布流程。
+也可以使用仓库根目录的两个脚本。启动脚本会从已忽略的 `materials/private/apis/` 读取本机凭据，隐藏启动服务并保存 PID；关闭脚本只会终止 PID 与命令行都匹配本项目的 Node 进程：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\start-backend.ps1
+powershell -ExecutionPolicy Bypass -File .\stop-backend.ps1
+```
+
+服务默认监听 `http://127.0.0.1:3050`，首次启动自动进入带永久标识的演示传感器模式。只要启动脚本读取到 IMAGE-2 凭据，作品页就会调用真实 IMAGE-2；生图失败或未配置时会明确回退原始观察照片，不会用本地占位图冒充 AI 输出。打开微信开发者工具，导入仓库根目录并选择“测试号”；项目配置会将小程序源码指向 `miniprogram/`，仓库不硬编码个人 AppID。
 
 ## 真实服务配置
 

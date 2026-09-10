@@ -338,8 +338,8 @@ export async function buildApp({ config, logger = true } = {}) {
       const outputPath = path.join(config.dataDir, 'illustrations', `${row.id}.png`);
       const result = await generateIllustration({ config, observation: storedObservation(row), analysis, outputPath });
       progress(90);
-      db.prepare('UPDATE observations SET illustration_path=?, updated_at=? WHERE id=?').run(outputPath, new Date().toISOString(), row.id);
-      return { provider: result.provider, label: result.label, fallbackReason: result.fallbackReason ?? null, illustrationUrl: `/api/v1/observations/${row.id}/illustration` };
+      if (result.filePath) db.prepare('UPDATE observations SET illustration_path=?, updated_at=? WHERE id=?').run(result.filePath, new Date().toISOString(), row.id);
+      return { provider: result.provider, label: result.label, fallbackReason: result.fallbackReason ?? null, illustrationUrl: result.filePath ? `/api/v1/observations/${row.id}/illustration` : null };
     });
     return reply.code(202).send(apiSuccess(request, job));
   });

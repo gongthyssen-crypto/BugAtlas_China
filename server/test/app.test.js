@@ -50,7 +50,8 @@ test('demo mode completes observation, analysis, artifacts and feed flow', async
 
   const illustrationJob = await body(await app.inject({ method: 'POST', url: `/api/v1/observations/${observation.id}/illustrations`, payload: {} }));
   const illustration = await waitJob(app, illustrationJob.id);
-  assert.match(illustration.label, /不参与识别|艺术化示意/);
+  assert.equal(illustration.provider, 'not-configured');
+  assert.equal(illustration.illustrationUrl, null);
 
   const postcard = await body(await app.inject({ method: 'POST', url: `/api/v1/observations/${observation.id}/artifacts`, payload: { type: 'postcard', includeAiIllustration: true } }));
   const detail = await body(await app.inject({ method: 'POST', url: `/api/v1/observations/${observation.id}/artifacts`, payload: { type: 'detail', includeAiIllustration: true } }));

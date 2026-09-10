@@ -21,15 +21,29 @@ Page({
     try {
       const job = await api.request(`/observations/${this.data.id}/illustrations`, { method: 'POST', data: {} });
       const result = await api.waitForJob(job.id, { timeout: 150000 });
-      this.setData({ illustrationUrl: api.absolute(result.illustrationUrl), includeIllustration: true });
+      this.setData({ illustrationUrl: api.absolute(result.illustrationUrl), includeIllustration: Boolean(result.illustrationUrl) });
       wx.showToast({ title: result.label, icon: 'none' });
+      return result;
     } catch (error) { wx.showToast({ title: api.messageOf(error), icon: 'none', duration: 3000 }); }
     finally { this.setData({ illustrationLoading: false }); }
   },
   async createArtifacts() {
-    this.setData({ artifactLoading: true, progressText: '编排中文与环境数据…' });
-    const payload = { includeAiIllustration: this.data.includeIllustration };
+    this.setData({ artifactLoading: true, progressText: '调用 IMAGE-2 生成无文字插画…' });
     try {
+      let includeAiIllustration = this.data.includeIllustration;
+      if (!this.data.illustrationUrl) {
+        const imageJob = await api.request(`/observations/${this.data.id}/illustrations`, { method: 'POST', data: {} });
+        const imageResult = await api.waitForJob(imageJob.id, {
+          timeout: 150000,
+          onProgress: value => this.setData({ progressText: `IMAGE-2 正在创作 ${value}%` })
+        });
+        const illustrationUrl = api.absolute(imageResult.illustrationUrl);
+        includeAiIllustration = Boolean(illustrationUrl);
+        this.setData({ illustrationUrl, includeIllustration: includeAiIllustration });
+        if (!includeAiIllustration) wx.showToast({ title: imageResult.label, icon: 'none', duration: 3200 });
+      }
+      this.setData({ progressText: '编排中文与环境数据…' });
+      const payload = { includeAiIllustration };
       const [postcard, detail] = await Promise.all([
         api.request(`/observations/${this.data.id}/artifacts`, { method: 'POST', data: { ...payload, type: 'postcard', templateId: 'museum-postcard-v1' }, timeout: 10000 }),
         api.request(`/observations/${this.data.id}/artifacts`, { method: 'POST', data: { ...payload, type: 'detail', templateId: 'museum-detail-v1' }, timeout: 10000 })
