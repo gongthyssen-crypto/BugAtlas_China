@@ -1,0 +1,18 @@
+{
+  "description": "虫迹中国——AI 自然观察站",
+  "miniprogramRoot": "miniprogram/",
+  "projectname": "bug-atlas-china",
+  "appid": "",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "compileHotReLoad": true,
+    "ignoreUploadUnusedFiles": true
+  },
+  "compileType": "miniprogram",
+  "simulatorType": "wechat",
+  "condition": {}
+}

@@ -1,0 +1,15 @@
+.photo-box { position: relative; height: 430rpx; margin-top: 40rpx; overflow: hidden; border: 3rpx dashed #778064; border-radius: 12rpx; background: rgba(216,221,201,.52); }
+.photo-box image { width: 100%; height: 100%; }
+.photo-empty { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: center; color: #5f6b52; }
+.camera-mark { margin-bottom: 12rpx; font-size: 82rpx; font-weight: 300; }
+.photo-empty text { margin-top: 10rpx; color: #858878; font-size: 20rpx; }
+.replace-tag { position: absolute; right: 18rpx; bottom: 18rpx; padding: 12rpx 20rpx; border-radius: 999rpx; background: rgba(38,48,36,.88); color: #fff; font-size: 21rpx; }
+.privacy { margin-top: 18rpx; }
+.form-card { padding-top: 6rpx; }
+.voice-row { display: flex; align-items: center; gap: 18rpx; margin-top: 18rpx; color: #777b6b; font-size: 21rpx; }
+.voice-row .btn { flex: none; }
+.listen { color: #a95031; }
+.picker-field { display: flex; justify-content: space-between; }
+.submit { width: 100%; margin-top: 32rpx; }
+.demo-link { width: 100%; margin: 26rpx 0 0; padding: 14rpx; color: #7e4b35; background: transparent; font-family: inherit; font-size: 23rpx; }
+.demo-link::after { border: 0; }

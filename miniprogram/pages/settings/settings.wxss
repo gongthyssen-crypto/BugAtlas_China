@@ -1,0 +1,16 @@
+.status-head { display: flex; align-items: center; justify-content: space-between; }
+.status-title, .sub-title { font-size: 32rpx; font-weight: 700; }
+.health-dot { width: 28rpx; height: 28rpx; border-radius: 50%; background: #6c844d; box-shadow: 0 0 0 12rpx rgba(108,132,77,.18); }
+.status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18rpx; margin-top: 28rpx; }
+.status-grid view { padding: 20rpx; background: rgba(216,221,201,.55); }
+.status-grid text, .protocol-stats text { display: block; color: #747966; font-size: 20rpx; }
+.status-grid strong { display: block; margin-top: 7rpx; font-size: 23rpx; overflow-wrap: anywhere; }
+.mode-card { display: flex; align-items: center; justify-content: space-between; }
+.mode-card .muted { max-width: 510rpx; margin-top: 8rpx; font-size: 21rpx; }
+.serial-status { display: flex; align-items: center; justify-content: space-between; color: #777b6b; font-size: 21rpx; }
+.serial-card .btn { width: 100%; margin-top: 22rpx; }
+.picker-field { display: flex; justify-content: space-between; }
+.protocol-stats { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 26rpx; border-top: 2rpx solid #d0cdbb; }
+.protocol-stats view { padding: 22rpx 10rpx 0; text-align: center; font-size: 29rpx; font-weight: 700; }
+.refresh { margin-top: 24rpx; color: #a95031; background: transparent; font-family: inherit; font-size: 23rpx; }
+.refresh::after { border: 0; }

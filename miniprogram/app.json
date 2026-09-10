@@ -1,0 +1,31 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/observe/observe",
+    "pages/mentor/mentor",
+    "pages/studio/studio",
+    "pages/feed/feed",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#263024",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "虫迹中国",
+    "backgroundColor": "#eee7d4",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#777a69",
+    "selectedColor": "#a34f30",
+    "backgroundColor": "#f7f2e6",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/home/home", "text": "观察站" },
+      { "pagePath": "pages/observe/observe", "text": "发现昆虫" },
+      { "pagePath": "pages/feed/feed", "text": "自然中国" },
+      { "pagePath": "pages/settings/settings", "text": "设置" }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

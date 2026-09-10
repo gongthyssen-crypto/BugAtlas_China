@@ -1,0 +1,1 @@
+<view class="source-badge source-{{source}}"><view class="dot"></view>{{label}}</view>

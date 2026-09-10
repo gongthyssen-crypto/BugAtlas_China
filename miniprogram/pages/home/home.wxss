@@ -1,0 +1,22 @@
+.home { padding-top: 48rpx; }
+.hero-row { display: flex; justify-content: space-between; align-items: flex-start; }
+.specimen-mark { width: 116rpx; height: 152rpx; padding-top: 18rpx; border: 3rpx solid #a95031; color: #a95031; font-size: 44rpx; font-weight: 700; text-align: center; transform: rotate(5deg); }
+.specimen-mark text { display: block; }
+.station-card { margin-top: 44rpx; padding: 32rpx; }
+.station-card::after { content: ""; position: absolute; right: 26rpx; bottom: 22rpx; width: 42rpx; height: 42rpx; border: 3rpx double #a95031; border-radius: 50%; opacity: .45; }
+.station-head { display: flex; justify-content: space-between; align-items: flex-start; }
+.station-code { color: #898b79; font-size: 20rpx; font-family: monospace; letter-spacing: 1rpx; }
+.metrics { display: grid; grid-template-columns: 1fr 1fr 1.25fr; gap: 12rpx; margin-top: 36rpx; }
+.metric { min-height: 160rpx; padding: 24rpx 10rpx; border-left: 2rpx solid #c7c4af; color: #757966; text-align: center; }
+.metric:first-child { border-left: 0; }
+.metric-value { color: #263024; font-size: 48rpx; font-weight: 700; }
+.metric-unit { margin-left: 5rpx; color: #a95031; font-size: 19rpx; }
+.metric view { margin-top: 12rpx; font-size: 21rpx; letter-spacing: 2rpx; }
+.trend { margin-top: 20rpx; padding-top: 24rpx; border-top: 2rpx solid rgba(38,48,36,.1); }
+.trend-label { color: #777b6b; font-size: 20rpx; }
+.bars { display: flex; align-items: flex-end; gap: 8rpx; height: 86rpx; margin-top: 14rpx; }
+.bar { flex: 1; min-height: 8rpx; background: #70804e; opacity: .75; border-radius: 4rpx 4rpx 0 0; transition: height .4s ease; }
+.presence { margin-top: 24rpx; color: #8c562e; font-size: 22rpx; }
+.presence text { color: #7b7c70; }
+.primary-action { width: 100%; margin-top: 34rpx; }
+.empty .btn { margin: 28rpx auto 0; }

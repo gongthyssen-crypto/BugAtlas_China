@@ -1,0 +1,36 @@
+<view class="page-shell mentor">
+  <view class="loading empty" wx:if="{{loading}}">博物导师正在翻阅观察笔记…</view>
+  <block wx:elif="{{analysis}}">
+    <view class="eyebrow">AI FIELD MENTOR</view>
+    <view class="page-title">不是判定，<br/>是一组观察线索</view>
+    <view class="source-row"><view class="source-badge source-{{observation.dataSource}}">{{observation.dataSource === 'demo' ? '演示分析' : '现场观察'}}</view><text>{{analysis.candidates.length}} 个候选方向</text></view>
+
+    <view class="hero-candidate card-dark card" wx:if="{{analysis.candidates.length}}">
+      <view class="candidate-number">候选 01</view>
+      <view class="candidate-name">{{analysis.candidates[0].commonName}}</view>
+      <view class="latin">{{analysis.candidates[0].scientificName || '暂不推断拉丁学名'}}</view>
+      <view class="wing-mark">⌁</view>
+    </view>
+    <view class="card" wx:else><view class="section-title">证据还不够</view><view class="muted">这也是有效的观察结果。换一个角度补拍，往往比强行猜测更有价值。</view></view>
+
+    <view class="section-title">证据桌</view>
+    <view class="evidence-grid" wx:for="{{analysis.candidates}}" wx:key="commonName" wx:for-index="candidateIndex">
+      <view class="candidate-tab"><text>0{{candidateIndex + 1}}</text>{{item.commonName}}</view>
+      <view class="evidence-column yes"><view class="label">支持线索</view><view wx:for="{{item.evidence}}" wx:key="*this" class="evidence-item">＋ {{item}}</view></view>
+      <view class="evidence-column no"><view class="label">仍有疑点</view><view wx:for="{{item.counterEvidence}}" wx:key="*this" class="evidence-item">？ {{item}}</view></view>
+      <view class="verify"><view class="label">下一步怎样核验</view><view wx:for="{{item.verifyNext}}" wx:key="*this" class="verify-item"><text>{{index + 1}}</text>{{item}}</view></view>
+    </view>
+
+    <view class="section-title">讲解笔记</view>
+    <view class="version-tabs"><view class="{{activeVersion === 'child' ? 'active' : ''}}" data-version="child" bindtap="setVersion">给孩子</view><view class="{{activeVersion === 'teacher' ? 'active' : ''}}" data-version="teacher" bindtap="setVersion">给教师</view></view>
+    <view class="explanation card">
+      <view wx:if="{{activeVersion === 'child'}}">{{analysis.childExplanation}}</view>
+      <view wx:else>{{analysis.teacherExplanation}}</view>
+      <button class="audio-button" bindtap="playTts" disabled="{{ttsLoading}}"><text>{{ttsLoading ? '…' : (playing ? 'Ⅱ' : '▶')}}</text>{{ttsLoading ? '正在生成本地语音' : (playing ? '暂停讲解' : '听儿童版讲解')}}</button>
+    </view>
+    <view class="safety">{{analysis.safetyNotice}}</view>
+    <view class="notice">{{analysis.disclaimer}}</view>
+    <button class="btn btn-rust studio-button" bindtap="openStudio">把观察做成自然作品 →</button>
+  </block>
+  <view class="empty" wx:else>分析尚未完成，请返回发现页重试。</view>
+</view>

@@ -1,0 +1,20 @@
+<view class="page-shell feed">
+  <view class="eyebrow">LETTERS FROM THE FIELD</view>
+  <view class="page-title">自然中国</view>
+  <view class="page-lead">从山地、湿地、农田到校园，一封封等待继续验证的自然来信。</view>
+  <scroll-view class="filters" scroll-x enable-flex><view wx:for="{{filters}}" wx:key="value" class="filter {{activeHabitat === item.value ? 'active' : ''}}" data-value="{{item.value}}" bindtap="selectFilter">{{item.label}}</view></scroll-view>
+
+  <view class="station-strip">
+    <view wx:for="{{stations}}" wx:key="stationId" class="station-chip"><text>{{item.observationCount}}</text><view>{{item.regionLabel}}<small>{{item.habitatLabel}}</small></view></view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty">正在收取自然来信…</view>
+  <view wx:elif="{{!posts.length}}" class="card empty"><view class="empty-mark">✉</view><view class="section-title">广场还在等第一封来信</view><view>完成一次观察、生成明信片并经本机教师审核后，作品会出现在这里。</view><button class="btn btn-rust" bindtap="createObservation">去记录新发现</button></view>
+  <view wx:else class="post-grid">
+    <view wx:for="{{posts}}" wx:key="id" class="post-card">
+      <image src="{{item.artifactUrl}}" mode="aspectFill" bindtap="preview" data-url="{{item.artifactUrl}}" />
+      <view class="post-body"><view class="post-region">{{item.regionLabel}} · {{item.schoolAlias}}</view><view class="post-message">{{item.message}}</view><view class="post-foot"><view class="source-badge source-{{item.dataSource}}">{{item.dataSource === 'demo' ? '演示数据' : '现场数据'}}</view><text>{{item.dateLabel}}</text></view></view>
+    </view>
+  </view>
+  <view class="notice">广场只展示模糊地区和学校别名，不公开儿童姓名、精确定位或原始语音。</view>
+</view>

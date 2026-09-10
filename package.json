@@ -1,0 +1,14 @@
+{
+  "name": "bug-atlas-china",
+  "private": true,
+  "version": "0.1.0",
+  "description": "虫迹中国——AI 自然观察站 MVP",
+  "packageManager": "pnpm@11.2.2",
+  "scripts": {
+    "dev": "pnpm --filter @bug-atlas/server dev",
+    "start": "pnpm --filter @bug-atlas/server start",
+    "test": "pnpm --filter @bug-atlas/server test",
+    "check": "pnpm --filter @bug-atlas/server check",
+    "firmware:compile": "tools\\arduino-cli\\arduino-cli.exe compile --config-file tools\\arduino-cli\\arduino-cli.yaml --fqbn arduino:avr:uno firmware\\bug_atlas_station"
+  }
+}

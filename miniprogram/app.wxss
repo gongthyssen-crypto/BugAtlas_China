@@ -1,0 +1,48 @@
+page {
+  --ink: #263024;
+  --moss: #596844;
+  --paper: #f4eedf;
+  --paper-deep: #e7dcc3;
+  --rust: #a95031;
+  --gold: #c89f4a;
+  --fog: #d8ddc9;
+  min-height: 100%;
+  background: #eee7d4;
+  color: #263024;
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-size: 28rpx;
+}
+
+view, text, image, button, input, textarea, picker, switch { box-sizing: border-box; }
+
+.page-shell { min-height: 100vh; padding: 28rpx 28rpx 60rpx; position: relative; overflow: hidden; }
+.page-shell::before { content: ""; position: fixed; width: 520rpx; height: 520rpx; right: -260rpx; top: 120rpx; border: 2rpx solid rgba(77, 91, 58, .18); border-radius: 50%; box-shadow: 0 0 0 46rpx rgba(77, 91, 58, .05), 0 0 0 92rpx rgba(77, 91, 58, .04); pointer-events: none; }
+.eyebrow { color: #a95031; font-size: 20rpx; letter-spacing: 6rpx; font-weight: 700; text-transform: uppercase; }
+.page-title { margin-top: 12rpx; font-size: 54rpx; line-height: 1.16; font-weight: 700; letter-spacing: 2rpx; }
+.page-lead { margin-top: 18rpx; max-width: 620rpx; color: #66705c; line-height: 1.75; }
+.section-title { margin: 42rpx 0 20rpx; font-size: 34rpx; font-weight: 700; }
+.card { position: relative; margin-top: 22rpx; padding: 28rpx; border: 2rpx solid rgba(38, 48, 36, .2); border-radius: 10rpx; background: rgba(247, 242, 230, .92); box-shadow: 10rpx 12rpx 0 rgba(72, 82, 58, .09); }
+.card-dark { color: #f5efdf; background: #263024; border-color: #263024; }
+.label { display: block; margin-bottom: 12rpx; color: #747966; font-size: 22rpx; letter-spacing: 2rpx; }
+.input, .textarea, .picker-field { width: 100%; min-height: 88rpx; padding: 24rpx; border: 2rpx solid #c7c4af; border-radius: 8rpx; background: rgba(255,255,255,.58); font-family: inherit; }
+.textarea { min-height: 190rpx; line-height: 1.65; }
+.field { margin-top: 28rpx; }
+.button-row { display: flex; gap: 18rpx; margin-top: 28rpx; }
+.btn { display: flex; align-items: center; justify-content: center; min-height: 88rpx; margin: 0; padding: 0 28rpx; border-radius: 8rpx; border: 2rpx solid #263024; background: #263024; color: #f7f2e6; font-family: inherit; font-size: 26rpx; font-weight: 700; line-height: 1.2; }
+.btn::after { border: 0; }
+.btn-secondary { color: #263024; background: transparent; }
+.btn-rust { background: #a95031; border-color: #a95031; }
+.btn-small { min-height: 66rpx; padding: 0 22rpx; font-size: 23rpx; }
+.btn[disabled] { opacity: .48; }
+.source-badge { display: inline-flex; align-items: center; min-height: 46rpx; padding: 0 18rpx; border-radius: 999rpx; font-size: 21rpx; font-weight: 700; letter-spacing: 1rpx; }
+.source-live { color: #2e5b2e; background: #d8e5c8; }
+.source-stale { color: #76580f; background: #f2deb0; }
+.source-demo { color: #8c4028; background: #edd0bd; }
+.source-offline { color: #6d6d68; background: #deddd6; }
+.divider { height: 2rpx; margin: 28rpx 0; background: rgba(38,48,36,.14); }
+.muted { color: #747966; }
+.rust { color: #a95031; }
+.notice { margin-top: 24rpx; padding: 20rpx 24rpx; border-left: 8rpx solid #c89f4a; background: rgba(216,221,201,.62); color: #596052; font-size: 23rpx; line-height: 1.65; }
+.empty { padding: 72rpx 30rpx; text-align: center; color: #747966; }
+.spinner { width: 30rpx; height: 30rpx; margin-right: 12rpx; border: 4rpx solid rgba(255,255,255,.32); border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }

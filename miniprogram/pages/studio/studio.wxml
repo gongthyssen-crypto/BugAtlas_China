@@ -1,0 +1,28 @@
+<view class="page-shell studio">
+  <view class="eyebrow">SPECIMEN PRESS</view>
+  <view class="page-title">把观察，寄给<br/>另一处自然</view>
+  <view class="page-lead">AI 只画没有文字的示意图；候选、证据和中文全部由固定模板清晰排版。</view>
+
+  <view class="card illustration-card">
+    <view class="card-heading"><view><view class="label">可选素材</view><view class="sub-title">无文字博物插画</view></view><view class="source-badge source-demo">不参与识别</view></view>
+    <image wx:if="{{illustrationUrl}}" class="illustration" src="{{illustrationUrl}}" mode="aspectFill" bindtap="preview" data-url="{{illustrationUrl}}" />
+    <view wx:else class="illustration-empty"><text>✣</text><view>生成一幅只用于作品排版的艺术化示意</view></view>
+    <button class="btn btn-secondary" disabled="{{illustrationLoading}}" bindtap="createIllustration">{{illustrationLoading ? '正在生成插画…' : (illustrationUrl ? '重新生成插画' : '生成 AI 艺术化示意图')}}</button>
+    <view wx:if="{{illustrationUrl}}" class="switch-row"><text>作品使用插画（关闭则使用原图）</text><switch color="#596844" checked="{{includeIllustration}}" bindchange="toggleIllustration" /></view>
+  </view>
+
+  <button class="btn btn-rust create-button" disabled="{{artifactLoading}}" bindtap="createArtifacts"><view wx:if="{{artifactLoading}}" class="spinner"></view>{{artifactLoading ? progressText : '生成两件自然作品'}}</button>
+
+  <view wx:if="{{postcard}}" class="works">
+    <view class="section-title">作品已装订</view>
+    <view class="work-card">
+      <image src="{{postcard.previewUrl}}" mode="aspectFill" bindtap="preview" data-url="{{postcard.previewUrl}}" />
+      <view class="work-meta"><view><text>01</text><view>自然明信片</view><small>1600 × 1000 PNG</small></view><view class="work-actions"><button data-url="{{postcard.previewUrl}}" bindtap="preview">预览</button><button data-url="{{postcard.previewUrl}}" bindtap="save">保存</button></view></view>
+    </view>
+    <view class="work-card detail-card">
+      <image src="{{detail.previewUrl}}" mode="aspectFill" bindtap="preview" data-url="{{detail.previewUrl}}" />
+      <view class="work-meta"><view><text>02</text><view>博物详解图</view><small>1080 × 1920 PNG</small></view><view class="work-actions"><button data-url="{{detail.previewUrl}}" bindtap="preview">预览</button><button data-url="{{detail.previewUrl}}" bindtap="save">保存</button></view></view>
+    </view>
+    <button class="btn publish" disabled="{{publishing}}" bindtap="publish">{{publishing ? '正在发布…' : '本机教师审核并发布到自然中国'}}</button>
+  </view>
+</view>

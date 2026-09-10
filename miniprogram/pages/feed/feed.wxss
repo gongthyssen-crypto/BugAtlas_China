@@ -1,0 +1,16 @@
+.filters { width: 100%; margin-top: 34rpx; white-space: nowrap; }
+.filter { display: inline-flex; min-width: 112rpx; height: 66rpx; margin-right: 14rpx; align-items: center; justify-content: center; border: 2rpx solid #aeb19d; border-radius: 999rpx; color: #646c59; font-size: 23rpx; }
+.filter.active { color: #f7f2e6; background: #52613d; border-color: #52613d; }
+.station-strip { display: flex; gap: 12rpx; margin-top: 26rpx; overflow: hidden; }
+.station-chip { display: flex; flex: 1; min-width: 0; align-items: center; gap: 10rpx; padding: 14rpx 10rpx; border-top: 2rpx solid #c2c1ae; border-bottom: 2rpx solid #c2c1ae; font-size: 17rpx; }
+.station-chip > text { color: #a95031; font-size: 34rpx; font-weight: 700; }
+.station-chip small { display: block; color: #848777; font-size: 16rpx; }
+.post-grid { margin-top: 30rpx; }
+.post-card { margin-top: 28rpx; overflow: hidden; border-radius: 10rpx; background: #f7f2e6; box-shadow: 10rpx 12rpx 0 rgba(72,82,58,.11); }
+.post-card image { width: 100%; height: 420rpx; background: #d8ddc9; }
+.post-body { padding: 25rpx; }
+.post-region { color: #a95031; font-size: 20rpx; font-weight: 700; letter-spacing: 1rpx; }
+.post-message { margin-top: 14rpx; font-size: 30rpx; line-height: 1.5; }
+.post-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 22rpx; color: #888979; font-size: 20rpx; }
+.empty-mark { color: #a95031; font-size: 72rpx; }
+.empty .btn { margin: 30rpx auto 0; }

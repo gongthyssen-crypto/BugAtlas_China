@@ -1,0 +1,39 @@
+<view class="page-shell home">
+  <view class="eyebrow">FIELD STATION · 01</view>
+  <view class="hero-row">
+    <view>
+      <view class="page-title">今天，谁来过<br/>这座昆虫旅馆？</view>
+      <view class="page-lead">{{greeting}}</view>
+    </view>
+    <view class="specimen-mark">虫<text>迹</text></view>
+  </view>
+
+  <view class="card station-card" wx:if="{{snapshot}}">
+    <view class="station-head">
+      <view>
+        <view class="label">当前微气候</view>
+        <status-pill source="{{snapshot.displaySource}}" age="{{snapshot.dataAgeMs}}" />
+      </view>
+      <view class="station-code">{{snapshot.deviceId}}</view>
+    </view>
+    <view class="metrics">
+      <view class="metric"><text class="metric-value">{{snapshot.temperatureC == null ? '—' : snapshot.temperatureC}}</text><text class="metric-unit">℃</text><view>温度</view></view>
+      <view class="metric"><text class="metric-value">{{snapshot.humidityPct == null ? '—' : snapshot.humidityPct}}</text><text class="metric-unit">%</text><view>湿度</view></view>
+      <view class="metric"><text class="metric-value">{{snapshot.lightRaw == null ? '—' : snapshot.lightRaw}}</text><text class="metric-unit">/1023</text><view>相对光照</view></view>
+    </view>
+    <view class="trend">
+      <view class="trend-label">近 28 秒光线变化</view>
+      <view class="bars"><view wx:for="{{historyBars}}" wx:key="id" class="bar" style="height: {{item.height}}%"></view></view>
+    </view>
+    <view class="presence" wx:if="{{snapshot.humanPresence}}">● 有观察者来到站点附近 <text>（不代表检测到昆虫）</text></view>
+  </view>
+
+  <view class="card empty" wx:else>
+    <view class="section-title">还没有环境来信</view>
+    <view>请启动本地服务，或到设置页切换演示模式。</view>
+    <button class="btn btn-secondary" bindtap="openSettings">检查连接</button>
+  </view>
+
+  <button class="btn btn-rust primary-action" bindtap="startObservation">＋ 记录一只新发现</button>
+  <view class="notice">光照显示的是裸光敏电阻的相对读数，不是 lux。AI 只提供候选方向，真正的答案来自持续观察。</view>
+</view>

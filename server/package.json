@@ -1,0 +1,22 @@
+{
+  "name": "@bug-atlas/server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "test": "node --test",
+    "check": "node scripts/check-project.js"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.3.0",
+    "@fastify/multipart": "^10.1.1",
+    "better-sqlite3": "^13.0.3",
+    "dotenv": "^17.4.2",
+    "fastify": "^5.12.3",
+    "serialport": "^13.0.0",
+    "sharp": "^0.35.4",
+    "zod": "^4.5.4"
+  }
+}

@@ -1,0 +1,10 @@
+packages:
+  - server
+
+onlyBuiltDependencies:
+  - "@serialport/bindings-cpp"
+  - better-sqlite3
+  - sharp
+allowBuilds:
+  '@serialport/bindings-cpp': set this to true or false
+  better-sqlite3: set this to true or false

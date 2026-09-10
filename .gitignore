@@ -7,5 +7,16 @@ materials/private/
 .env.local
 .env.*.local
 
+# Dependencies and local runtime data
+node_modules/
+data/
+server/data/
+.pnpm-store/
+project.private.config.json
+
+# Firmware build output and local tools
+firmware/**/build/
+tools/
+
 # Generated artifacts
 output/

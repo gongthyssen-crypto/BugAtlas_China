@@ -1,0 +1,4 @@
+{
+  "navigationBarTitleText": "自然观察站",
+  "usingComponents": { "status-pill": "/components/status-pill/status-pill" }
+}

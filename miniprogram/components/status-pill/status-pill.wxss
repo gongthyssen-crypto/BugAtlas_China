@@ -1,0 +1,6 @@
+.source-badge { display: inline-flex; align-items: center; min-height: 46rpx; padding: 0 18rpx; border-radius: 999rpx; font-size: 21rpx; font-weight: 700; letter-spacing: 1rpx; }
+.dot { width: 12rpx; height: 12rpx; margin-right: 12rpx; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 6rpx rgba(255,255,255,.25); }
+.source-live { color: #2e5b2e; background: #d8e5c8; }
+.source-stale { color: #76580f; background: #f2deb0; }
+.source-demo { color: #8c4028; background: #edd0bd; }
+.source-offline { color: #6d6d68; background: #deddd6; }

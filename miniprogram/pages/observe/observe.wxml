@@ -1,0 +1,27 @@
+<view class="page-shell">
+  <view class="eyebrow">NEW FIELD NOTE</view>
+  <view class="page-title">记录，不急着<br/>给它一个答案</view>
+  <view class="page-lead">先拍清楚昆虫与周围环境，再写下你真正看见的颜色、大小和动作。</view>
+
+  <view class="photo-box {{imagePath ? 'has-photo' : ''}}" bindtap="chooseImage">
+    <image wx:if="{{imagePath}}" src="{{imagePath}}" mode="aspectFill" />
+    <view wx:else class="photo-empty"><view class="camera-mark">◎</view><view>拍摄或从电脑选择图片</view><text>JPG / PNG · 最大 10 MB</text></view>
+    <view wx:if="{{imagePath}}" class="replace-tag">更换照片</view>
+  </view>
+  <view class="notice privacy">只拍昆虫和它身边的环境，请避开儿童正脸、姓名卡和精确门牌。</view>
+
+  <view class="card form-card">
+    <view class="field"><text class="label">你观察到了什么？（可以留空）</text><textarea class="textarea" maxlength="1000" value="{{description}}" data-field="description" bindinput="bindInput" placeholder="例如：黄黑相间，停在叶片背面，大约两厘米……" /></view>
+    <view class="voice-row">
+      <button class="btn btn-secondary btn-small" bindtap="startRecord">{{recording ? '停止录音' : '口述观察'}}</button>
+      <button wx:if="{{audioPath}}" class="listen" bindtap="playRecord">试听本机录音</button>
+      <text wx:else>录音可本机试听；文字输入始终可用</text>
+    </view>
+    <view class="field"><text class="label">发现地点（模糊位置）</text><input class="input" value="{{locationLabel}}" data-field="locationLabel" bindinput="bindInput" /></view>
+    <view class="field"><text class="label">学校或小组别名</text><input class="input" value="{{schoolAlias}}" data-field="schoolAlias" bindinput="bindInput" /></view>
+    <view class="field"><text class="label">自然场景</text><picker mode="selector" range="{{habitats}}" range-key="label" value="{{habitatIndex}}" bindchange="habitatChange"><view class="picker-field">{{habitats[habitatIndex].label}} <text>⌄</text></view></picker></view>
+  </view>
+
+  <button class="btn btn-rust submit" disabled="{{submitting}}" bindtap="submit"><view wx:if="{{submitting}}" class="spinner"></view>{{submitting ? progressText : '请 AI 博物导师分析'}}</button>
+  <button class="demo-link" disabled="{{submitting}}" bindtap="useDemo">没有合适照片？一键载入完整演示观察 →</button>
+</view>
