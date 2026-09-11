@@ -22,8 +22,16 @@ function textLines(lines, x, y, fontSize, lineHeight, options = {}) {
   return lines.map((line, index) => `<text x="${x}" y="${y + index * lineHeight}" text-anchor="${anchor}" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="${fontSize}" font-weight="${weight}" letter-spacing="${letterSpacing}" fill="${fill}">${esc(line)}</text>`).join('');
 }
 
-async function coverImage(inputPath, width, height) {
-  return sharp(inputPath).rotate().resize(width, height, { fit: 'cover' }).modulate({ saturation: 0.92 }).png().toBuffer();
+async function frameImage(inputPath, width, height, { preserveWhole = false } = {}) {
+  const resizeOptions = preserveWhole
+    ? { fit: 'contain', position: 'centre', background: palette.paper }
+    : { fit: 'cover', position: 'centre' };
+  return sharp(inputPath)
+    .rotate()
+    .resize(width, height, resizeOptions)
+    .modulate({ saturation: 0.92 })
+    .png()
+    .toBuffer();
 }
 
 export async function createDemoObservationImage(outputPath) {
@@ -60,7 +68,7 @@ export async function renderArtifact({ config, observation, analysis, type, incl
 }
 
 async function renderPostcard({ outputPath, imagePath, observation, analysis, commonName, sensor, aiImage }) {
-  const photo = await coverImage(imagePath, 900, 720);
+  const photo = await frameImage(imagePath, 900, 720, { preserveWhole: aiImage });
   const prose = wrap(analysis?.postcardText ?? analysis?.childExplanation ?? '记录一只昆虫，也记录它出现时的风、光与空气。', 14, 6);
   const date = new Date(observation.capturedAt).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000">
@@ -85,7 +93,7 @@ async function renderPostcard({ outputPath, imagePath, observation, analysis, co
 }
 
 async function renderDetail({ outputPath, imagePath, observation, analysis, commonName, sensor, aiImage }) {
-  const photo = await coverImage(imagePath, 940, 690);
+  const photo = await frameImage(imagePath, 940, 690, { preserveWhole: aiImage });
   const candidate = analysis?.candidates?.[0];
   const evidence = (candidate?.evidence ?? ['当前证据不足']).slice(0, 4).map(item => `· ${item}`);
   const verify = (candidate?.verifyNext ?? ['换一个角度补拍', '记录昆虫的动作']).slice(0, 4).map((item, index) => `${index + 1}. ${item}`);
@@ -95,8 +103,8 @@ async function renderDetail({ outputPath, imagePath, observation, analysis, comm
     ${textLines(['虫宿博物志'], 70, 105, 34, 40, { fill: palette.rust, weight: 700, letterSpacing: 8 })}
     ${textLines(['FIELD NOTE / 观察标本页'], 1010, 103, 17, 22, { fill: palette.moss, anchor: 'end', letterSpacing: 2 })}
     <image x="70" y="145" width="940" height="690" href="data:image/png;base64,${photo.toString('base64')}"/>
-    <rect x="70" y="770" width="940" height="65" fill="${palette.ink}" opacity=".9"/>
-    ${textLines([aiImage ? 'AI 艺术化示意图 · 不参与识别' : `${observation.locationLabel} · 学生观察原图`], 95, 813, 20, 24, { fill: palette.paper })}
+    <rect x="70" y="835" width="940" height="40" fill="${palette.ink}" opacity=".9"/>
+    ${textLines([aiImage ? 'AI 艺术化示意图 · 不参与识别' : `${observation.locationLabel} · 学生观察原图`], 95, 862, 17, 21, { fill: palette.paper })}
     ${textLines(['首要候选'], 70, 910, 20, 26, { fill: palette.rust, weight: 700, letterSpacing: 3 })}
     ${textLines([commonName], 70, 978, 54, 60, { weight: 700 })}
     ${textLines(['为什么这样想'], 70, 1055, 25, 30, { fill: palette.moss, weight: 700 })}
