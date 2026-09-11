@@ -21,3 +21,4 @@
 .port-detail, .serial-help { margin-top: 12rpx; font-size: 21rpx; }
 .address-actions { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; }
 .address-actions .refresh { flex: 1; padding: 0; }
+.retry-note { margin-top: 16rpx; color: #52613d; }

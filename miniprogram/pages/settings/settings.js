@@ -20,26 +20,60 @@ Page({
     apiBase: DEFAULT_API_BASE,
     backendError: '',
     portsError: '',
-    serialError: ''
+    serialError: '',
+    autoRetrying: false
   },
-  onShow() { this.setData({ apiBase: getApp().globalData.apiBase }); this.refresh(); },
-  async refresh() {
-    this.setData({ loading: true, backendError: '', portsError: '', serialError: '' });
-    let health;
+  onShow() {
+    this.pageVisible = true;
+    this.setData({ apiBase: getApp().globalData.apiBase });
+    this.refresh();
+  },
+  onHide() {
+    this.pageVisible = false;
+    this.clearRefreshTimer();
+  },
+  onUnload() {
+    this.pageVisible = false;
+    this.clearRefreshTimer();
+  },
+  clearRefreshTimer() {
+    if (!this.refreshTimer) return;
+    clearTimeout(this.refreshTimer);
+    this.refreshTimer = null;
+  },
+  scheduleRefresh(delay = 5000) {
+    this.clearRefreshTimer();
+    if (!this.pageVisible) return;
+    this.refreshTimer = setTimeout(() => this.refresh({ showLoading: false }), delay);
+  },
+  async refresh(options = {}) {
+    if (this.refreshing) return;
+    this.refreshing = true;
+    this.clearRefreshTimer();
+    const showLoading = options.showLoading !== false;
+    if (showLoading) this.setData({ loading: true, backendError: '', portsError: '', serialError: '' });
     try {
-      health = await api.request('/health', { timeout: 4000 });
+      const health = await api.request('/health', { timeout: 4000 });
       this.setData({ health, serial: health.serial || offlineSerial() });
+      try {
+        const ports = await api.request('/serial/ports', { timeout: 5000 });
+        const selectedIndex = Math.min(this.data.portIndex, Math.max(ports.length - 1, 0));
+        this.setData({ ports, portIndex: selectedIndex, loading: false, backendError: '', portsError: '', autoRetrying: false });
+      } catch (error) {
+        this.setData({ ports: [], loading: false, portsError: api.diagnosticOf(error), autoRetrying: false });
+      }
     } catch (error) {
-      this.setData({ health: null, serial: offlineSerial(), ports: [], loading: false, backendError: api.diagnosticOf(error) });
-      return;
-    }
-
-    try {
-      const ports = await api.request('/serial/ports', { timeout: 5000 });
-      const selectedIndex = Math.min(this.data.portIndex, Math.max(ports.length - 1, 0));
-      this.setData({ ports, portIndex: selectedIndex, loading: false });
-    } catch (error) {
-      this.setData({ ports: [], loading: false, portsError: api.diagnosticOf(error) });
+      this.setData({
+        health: null,
+        serial: offlineSerial(),
+        ports: [],
+        loading: false,
+        backendError: api.diagnosticOf(error),
+        autoRetrying: true
+      });
+    } finally {
+      this.refreshing = false;
+      this.scheduleRefresh(this.data.health ? 5000 : 2000);
     }
   },
   portChange(event) { this.setData({ portIndex: Number(event.detail.value) }); },

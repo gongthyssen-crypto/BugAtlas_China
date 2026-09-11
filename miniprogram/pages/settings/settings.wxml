@@ -17,6 +17,7 @@
     <view class="muted">请在项目根目录运行 <text class="rust">.\start-backend.ps1</text>；不需要再执行 pnpm start。</view>
     <view class="diagnostic-url">检查地址：{{apiBase}}/health</view>
     <view class="error-detail" wx:if="{{backendError}}">{{backendError}}</view>
+    <view class="muted retry-note" wx:if="{{autoRetrying}}">正在每 2 秒自动重试；后端恢复后这里会自动更新。</view>
   </view>
 
   <view class="card mode-card" wx:if="{{health}}">
