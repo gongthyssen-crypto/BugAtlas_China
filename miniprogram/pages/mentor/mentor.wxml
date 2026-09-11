@@ -1,9 +1,9 @@
 <view class="page-shell mentor">
   <view class="loading empty" wx:if="{{loading}}">博物导师正在翻阅观察笔记…</view>
-  <block wx:elif="{{analysis}}">
+  <block wx:if="{{!loading && analysis}}">
     <view class="eyebrow">AI FIELD MENTOR</view>
     <view class="page-title">不是判定，<br/>是一组观察线索</view>
-    <view class="source-row"><view class="source-badge source-{{observation.dataSource}}">{{observation.dataSource === 'demo' ? '演示分析' : '现场观察'}}</view><text>{{analysis.candidates.length}} 个候选方向</text></view>
+    <view class="source-row"><view class="source-badge source-{{observation.dataSource}}">{{sourceLabel}}</view><text>{{candidateCount}} 个候选方向</text></view>
 
     <view class="hero-candidate card-dark card" wx:if="{{analysis.candidates.length}}">
       <view class="candidate-number">候选 01</view>
@@ -32,5 +32,10 @@
     <view class="notice">{{analysis.disclaimer}}</view>
     <button class="btn btn-rust studio-button" bindtap="openStudio">把观察做成自然作品 →</button>
   </block>
-  <view class="empty" wx:else>分析尚未完成，请返回发现页重试。</view>
+  <view class="error-state card" wx:if="{{!loading && !analysis}}">
+    <view class="error-mark">!</view>
+    <view class="section-title">导师页面没有载入</view>
+    <view class="muted">{{errorMessage || '分析尚未完成，请稍后重试。'}}</view>
+    <button class="btn btn-rust retry-button" bindtap="retry">重新载入</button>
+  </view>
 </view>

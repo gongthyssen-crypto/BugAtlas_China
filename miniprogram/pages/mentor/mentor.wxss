@@ -24,3 +24,7 @@
 .audio-button text { display: inline-flex; width: 54rpx; height: 54rpx; align-items: center; justify-content: center; border: 2rpx solid #a95031; border-radius: 50%; }
 .safety { margin-top: 24rpx; color: #8a4a32; font-size: 23rpx; font-weight: 700; }
 .studio-button { width: 100%; margin-top: 32rpx; }
+.error-state { margin-top: 90rpx; text-align: center; }
+.error-state .section-title { margin-top: 18rpx; }
+.error-mark { display: inline-flex; width: 76rpx; height: 76rpx; align-items: center; justify-content: center; border: 2rpx solid #a95031; border-radius: 50%; color: #a95031; font-size: 42rpx; font-weight: 700; }
+.retry-button { width: 100%; margin-top: 34rpx; }
