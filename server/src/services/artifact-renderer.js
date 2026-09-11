@@ -17,6 +17,25 @@ function wrap(value, max = 22, lines = 5) {
   return result;
 }
 
+function wrapBulletItems(items, max = 40, lines = 5) {
+  const result = [];
+  const sourceItems = items.map(item => [...String(item ?? '')]);
+  for (let itemIndex = 0; itemIndex < sourceItems.length; itemIndex += 1) {
+    const chars = sourceItems[itemIndex];
+    let firstLine = true;
+    while (chars.length) {
+      result.push(`${firstLine ? '· ' : '　'}${chars.splice(0, max).join('')}`);
+      firstLine = false;
+      if (result.length === lines) {
+        const hasMore = chars.length > 0 || itemIndex < sourceItems.length - 1;
+        if (hasMore) result[result.length - 1] = `${result[result.length - 1].slice(0, -1)}…`;
+        return result;
+      }
+    }
+  }
+  return result;
+}
+
 function textLines(lines, x, y, fontSize, lineHeight, options = {}) {
   const { fill = palette.ink, weight = 400, anchor = 'start', letterSpacing = 0 } = options;
   return lines.map((line, index) => `<text x="${x}" y="${y + index * lineHeight}" text-anchor="${anchor}" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="${fontSize}" font-weight="${weight}" letter-spacing="${letterSpacing}" fill="${fill}">${esc(line)}</text>`).join('');
@@ -77,7 +96,7 @@ async function renderPostcard({ outputPath, imagePath, observation, analysis, co
     <rect x="80" y="82" width="900" height="720" fill="#fff" stroke="${palette.ink}" stroke-width="3"/>
     <image x="80" y="82" width="900" height="720" href="data:image/png;base64,${photo.toString('base64')}"/>
     <rect x="1040" y="88" width="430" height="104" fill="${palette.ink}"/>
-    ${textLines(['虫迹中国'], 1075, 157, 46, 54, { fill: palette.paper, weight: 700, letterSpacing: 8 })}
+    ${textLines(['虫宿博物志'], 1075, 157, 46, 54, { fill: palette.paper, weight: 700, letterSpacing: 8 })}
     ${textLines(['NATURE POST · 001'], 1077, 225, 18, 24, { fill: palette.rust, weight: 700, letterSpacing: 3 })}
     ${textLines(wrap(`候选｜${commonName}`, 14, 2), 1045, 305, 36, 52, { weight: 700 })}
     <line x1="1045" y1="392" x2="1470" y2="392" stroke="${palette.gold}" stroke-width="6"/>
@@ -95,9 +114,9 @@ async function renderPostcard({ outputPath, imagePath, observation, analysis, co
 async function renderDetail({ outputPath, imagePath, observation, analysis, commonName, sensor, aiImage }) {
   const photo = await frameImage(imagePath, 940, 690, { preserveWhole: aiImage });
   const candidate = analysis?.candidates?.[0];
-  const evidence = (candidate?.evidence ?? ['当前证据不足']).slice(0, 4).map(item => `· ${item}`);
+  const evidence = wrapBulletItems((candidate?.evidence ?? ['当前证据不足']).slice(0, 4), 40, 5);
   const verify = (candidate?.verifyNext ?? ['换一个角度补拍', '记录昆虫的动作']).slice(0, 4).map((item, index) => `${index + 1}. ${item}`);
-  const teacher = wrap(analysis?.teacherExplanation ?? '观察仍需更多可核验特征。', 30, 7);
+  const teacher = wrap(analysis?.teacherExplanation ?? '观察仍需更多可核验特征。', 43, 4);
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920">
     <rect width="1080" height="1920" fill="${palette.paper}"/><rect x="34" y="34" width="1012" height="1852" fill="none" stroke="${palette.ink}" stroke-width="2"/>
     ${textLines(['虫宿博物志'], 70, 105, 34, 40, { fill: palette.rust, weight: 700, letterSpacing: 8 })}
@@ -107,18 +126,21 @@ async function renderDetail({ outputPath, imagePath, observation, analysis, comm
     ${textLines([aiImage ? 'AI 艺术化示意图 · 不参与识别' : `${observation.locationLabel} · 学生观察原图`], 95, 862, 17, 21, { fill: palette.paper })}
     ${textLines(['首要候选'], 70, 910, 20, 26, { fill: palette.rust, weight: 700, letterSpacing: 3 })}
     ${textLines([commonName], 70, 978, 54, 60, { weight: 700 })}
-    ${textLines(['为什么这样想'], 70, 1055, 25, 30, { fill: palette.moss, weight: 700 })}
-    ${textLines(evidence, 70, 1105, 23, 39)}
-    <rect x="570" y="890" width="440" height="305" rx="12" fill="#dfe2cf"/>
-    ${textLines(['环境快照'], 610, 945, 23, 30, { fill: palette.moss, weight: 700 })}
-    ${textLines([`${sensor.temperatureC ?? '—'} ℃  温度`, `${sensor.humidityPct ?? '—'} %RH  湿度`, `${sensor.lightRaw ?? '—'} / 1023  相对光照`, observation.dataSource === 'demo' ? '演示数据' : '现场数据'], 610, 1000, 26, 47, { weight: 700 })}
-    <line x1="70" y1="1245" x2="1010" y2="1245" stroke="${palette.gold}" stroke-width="6"/>
-    ${textLines(['下一次，继续看什么？'], 70, 1315, 28, 34, { fill: palette.rust, weight: 700 })}
-    ${textLines(verify, 70, 1370, 25, 45)}
-    ${textLines(['给教师的观察提示'], 70, 1585, 25, 30, { fill: palette.moss, weight: 700 })}
-    ${textLines(teacher, 70, 1635, 21, 35)}
-    <rect x="70" y="1780" width="940" height="70" fill="${palette.ink}"/>
-    ${textLines(['AI 辅助分析，仅供自然教育；请保持距离，不要徒手捕捉未知昆虫。'], 540, 1825, 17, 20, { fill: palette.paper, anchor: 'middle' })}
+    ${textLines(['为什么这样想'], 70, 1045, 25, 30, { fill: palette.moss, weight: 700 })}
+    ${textLines(evidence, 70, 1088, 20, 27)}
+    <rect x="70" y="1225" width="940" height="115" rx="12" fill="${palette.fog}"/>
+    ${textLines(['环境快照'], 105, 1264, 21, 26, { fill: palette.moss, weight: 700 })}
+    ${textLines([`${sensor.temperatureC ?? '—'}℃ 温度`], 105, 1310, 20, 25, { weight: 700 })}
+    ${textLines([`${sensor.humidityPct ?? '—'}%RH 湿度`], 330, 1310, 20, 25, { weight: 700 })}
+    ${textLines([`光照 ${sensor.lightRaw ?? '—'} / 1023`], 585, 1310, 20, 25, { weight: 700 })}
+    ${textLines([observation.dataSource === 'demo' ? '演示数据' : '现场数据'], 955, 1310, 19, 24, { fill: palette.rust, weight: 700, anchor: 'end' })}
+    <line x1="70" y1="1370" x2="1010" y2="1370" stroke="${palette.gold}" stroke-width="6"/>
+    ${textLines(['下一次，继续看什么？'], 70, 1430, 28, 34, { fill: palette.rust, weight: 700 })}
+    ${textLines(verify, 70, 1480, 22, 39)}
+    ${textLines(['给教师的观察提示'], 70, 1650, 24, 30, { fill: palette.moss, weight: 700 })}
+    ${textLines(teacher, 70, 1695, 18, 29)}
+    <rect x="70" y="1810" width="940" height="50" fill="${palette.ink}"/>
+    ${textLines(['AI 辅助分析，仅供自然教育；请保持距离，不要徒手捕捉未知昆虫。'], 540, 1842, 15, 18, { fill: palette.paper, anchor: 'middle' })}
   </svg>`;
   await sharp(Buffer.from(svg)).png().toFile(outputPath);
 }

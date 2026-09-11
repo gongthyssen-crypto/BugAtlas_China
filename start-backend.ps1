@@ -40,7 +40,7 @@ New-Item -ItemType Directory -Path $logDir -Force | Out-Null
 $healthyBackend = Find-HealthyBackend
 if ($healthyBackend) {
   Set-Content -LiteralPath $pidFile -Value $healthyBackend.ProcessId -Encoding ascii
-  Write-Host "虫迹中国后端已经在运行：http://127.0.0.1:3150" -ForegroundColor Yellow
+  Write-Host "虫宿博物志后端已经在运行：http://127.0.0.1:3150" -ForegroundColor Yellow
   Write-Host "PID: $($healthyBackend.ProcessId)"
   Write-Host '无需再执行 pnpm start；现在可回到小程序点击“重新检查”。' -ForegroundColor Cyan
   exit 0
@@ -115,7 +115,7 @@ if (-not $ready) {
 
 $kimiMode = if ($env:KIMI_ANTHROPIC_API_KEY) { 'Kimi 凭证已载入，本地后端将调用真实 AI 导师。' } else { '未找到 Kimi 凭证，AI 导师将明确使用演示分析。' }
 $imageMode = if ($env:IMAGE_API_KEY) { 'IMAGE-2 凭证已载入，将生成真实 AI 插画。' } else { '未找到 IMAGE-2 凭证，将明确回退原始照片。' }
-Write-Host '虫迹中国后端已启动：http://127.0.0.1:3150' -ForegroundColor Green
+Write-Host '虫宿博物志后端已启动：http://127.0.0.1:3150' -ForegroundColor Green
 Write-Host "PID: $($process.Id)"
 Write-Host $kimiMode -ForegroundColor Cyan
 Write-Host $imageMode -ForegroundColor Cyan

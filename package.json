@@ -2,7 +2,7 @@
   "name": "bug-atlas-china",
   "private": true,
   "version": "0.1.0",
-  "description": "虫迹中国——AI 自然观察站 MVP",
+  "description": "虫宿博物志——AI 自然观察站 MVP",
   "packageManager": "pnpm@11.2.2",
   "scripts": {
     "dev": "pnpm --filter @bug-atlas/server dev",

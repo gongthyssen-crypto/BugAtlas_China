@@ -48,7 +48,7 @@ if (-not $processInfo) {
 }
 
 if (-not $processInfo) {
-  Write-Host '没有发现运行中的虫迹中国后端。' -ForegroundColor Yellow
+  Write-Host '没有发现运行中的虫宿博物志后端。' -ForegroundColor Yellow
   exit 0
 }
 
@@ -57,4 +57,4 @@ try { Wait-Process -Id $backendPid -Timeout 5 -ErrorAction SilentlyContinue } ca
 $remaining = Get-Process -Id $backendPid -ErrorAction SilentlyContinue
 if ($remaining) { Stop-Process -Id $backendPid -Force -ErrorAction SilentlyContinue }
 Remove-Item -LiteralPath $pidFile -Force -ErrorAction SilentlyContinue
-Write-Host "虫迹中国后端已关闭（PID: $backendPid）。" -ForegroundColor Green
+Write-Host "虫宿博物志后端已关闭（PID: $backendPid）。" -ForegroundColor Green

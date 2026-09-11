@@ -88,7 +88,7 @@ export async function buildApp({ config, logger = true } = {}) {
     return reply.code(error.statusCode ?? 500).send(apiError(request, error.code ?? 'INTERNAL_ERROR', error.publicMessage ?? '本地服务暂时无法完成请求', Boolean(error.retryable)));
   });
 
-  app.get('/', async (_request, reply) => reply.type('text/html; charset=utf-8').send(`<!doctype html><meta charset="utf-8"><title>虫迹中国本地服务</title><style>body{font:18px/1.7 Georgia,"Microsoft YaHei";max-width:760px;margin:12vh auto;color:#263022;background:#f3eddc}code{background:#dfe2cf;padding:.15em .4em}</style><h1>虫迹中国 · 本地服务</h1><p>串口桥接、AI、语音和作品服务正在运行。</p><p>健康检查：<code>/api/v1/health</code></p>`));
+  app.get('/', async (_request, reply) => reply.type('text/html; charset=utf-8').send(`<!doctype html><meta charset="utf-8"><title>虫宿博物志本地服务</title><style>body{font:18px/1.7 Georgia,"Microsoft YaHei";max-width:760px;margin:12vh auto;color:#263022;background:#f3eddc}code{background:#dfe2cf;padding:.15em .4em}</style><h1>虫宿博物志 · 本地服务</h1><p>串口桥接、AI、语音和作品服务正在运行。</p><p>健康检查：<code>/api/v1/health</code></p>`));
 
   app.get('/api/v1/health', async request => apiSuccess(request, {
     serviceId: 'bug-atlas-china-local',

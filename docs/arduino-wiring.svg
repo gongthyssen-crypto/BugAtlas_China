@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
-  <title id="title">虫迹中国 Arduino UNO R3 接线原理图</title>
+  <title id="title">虫宿博物志 Arduino UNO R3 接线原理图</title>
   <desc id="desc">Arduino UNO R3 连接 DHT11 温湿度传感器、一个通用裸光敏电阻和一个独立 10kΩ 电阻组成的分压电路，以及可选 HC-SR501 人体红外传感器，并通过 USB 连接 Windows 电脑。</desc>
   <defs>
     <style>
@@ -30,7 +30,7 @@
   <rect width="1600" height="1000" fill="#f4efe3"/>
   <rect width="1600" height="1000" fill="url(#grid)"/>
   <rect x="0" y="0" width="1600" height="112" fill="#263024"/>
-  <text x="72" y="62" class="title" style="fill:#f8f3e8">虫迹中国 · Arduino UNO R3 接线原理图</text>
+  <text x="72" y="62" class="title" style="fill:#f8f3e8">虫宿博物志 · Arduino UNO R3 接线原理图</text>
   <text x="74" y="92" class="subtitle" style="fill:#dfe4d6">基础版：DHT11 + 裸光敏电阻 + 10kΩ 电阻　扩展：HC-SR501（仅检测观察者靠近）</text>
 
   <!-- Power rails -->
