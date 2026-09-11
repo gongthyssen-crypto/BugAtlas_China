@@ -32,7 +32,7 @@ flowchart LR
     M --> O[观察 / 创作 / 审核 / 广场]
 ```
 
-后端默认只监听 `127.0.0.1:3050`。Arduino 只负责稳定采集，不保存云端密钥；小程序也不包含任何 AI 凭证。
+后端默认只监听 `127.0.0.1:3150`。Arduino 只负责稳定采集，不保存云端密钥；小程序也不包含任何 AI 凭证。
 
 ## 仓库结构
 
@@ -88,10 +88,12 @@ pnpm install
 powershell -ExecutionPolicy Bypass -File .\start-backend.ps1
 ```
 
+> **后端只能启动一次。** 日常演示只运行上面的 `start-backend.ps1`，不要再另外执行 `pnpm start` 或 `pnpm dev`。小程序本身不会启动后端，它只连接已经运行的本地服务。
+
 看到“虫迹中国后端已启动”后，可访问：
 
-- 服务首页：<http://127.0.0.1:3050>
-- 健康检查：<http://127.0.0.1:3050/api/v1/health>
+- 服务首页：<http://127.0.0.1:3150>
+- 健康检查：<http://127.0.0.1:3150/api/v1/health>
 - 日志目录：`server/data/logs/`
 
 关闭后端：
@@ -100,11 +102,26 @@ powershell -ExecutionPolicy Bypass -File .\start-backend.ps1
 powershell -ExecutionPolicy Bypass -File .\stop-backend.ps1
 ```
 
-启动脚本会后台运行服务、记录 PID、等待健康检查，并在失败时指向错误日志；关闭脚本会核对 PID 和进程命令，只终止本项目的 Node 进程。开发时也可用前台热重载：
+启动脚本会后台运行服务、记录 PID、等待健康检查，并在失败时指向错误日志；重复运行脚本时只会提示“后端已经在运行”，不会再创建第二个实例。关闭脚本会核对监听端口、健康接口、PID 和进程命令，只终止本项目的 Node 进程。
+
+### 启动方式必须三选一
+
+| 使用场景 | 命令 | 是否后台运行 |
+| --- | --- | --- |
+| 日常演示、微信小程序联调（推荐） | `.\start-backend.ps1` | 是，由 `.\stop-backend.ps1` 关闭 |
+| 普通前台运行 | `pnpm start` | 否，在当前终端按 `Ctrl+C` 关闭 |
+| 开发热重载 | `pnpm dev` | 否，在当前终端按 `Ctrl+C` 关闭 |
+
+三种方式都会启动同一个后端，**绝对不要同时运行两种**。如果先运行了 PS1，又运行 `pnpm start`，第二个进程会争抢同一个端口，造成“小程序访问错进程”“端口已占用”或关闭脚本找不到正确实例。
+
+需要修改后端代码时，应先运行：
 
 ```powershell
+.\stop-backend.ps1
 pnpm dev
 ```
+
+开发结束后按 `Ctrl+C`，再根据需要恢复 PS1 后台模式。
 
 ## 配置真实 AI 服务
 
@@ -135,7 +152,17 @@ IMAGE_MODEL=gpt-image-2
 - `.env.local` 已被 Git 忽略；不要把密钥写进小程序、截图、日志或提交历史。
 - `IMAGE_MODEL` 必须是凭证实际支持的 IMAGE-2 模型名；项目默认使用 `gpt-image-2`。
 - `DEMO_FALLBACK=true` 表示真实服务失败时保留观察记录，并清楚标记演示回退。
+- `DEMO_MODE` 只决定传感器数据来自演示数据还是 Arduino，不会关闭已配置的 Kimi AI。即使没有连接 Arduino，也可以使用“演示观察”测试真实 AI 导师。
 - 本地已有 `materials/private/apis/` 时，一键启动脚本也会兼容读取其中的旧凭证；公开部署请使用 `.env.local`。
+
+### 在本机使用 AI 小导师
+
+1. 运行 `.\start-backend.ps1`，确认启动结果显示已加载 Kimi 凭证。
+2. 在微信开发者工具中重新编译小程序，进入“发现昆虫”。
+3. 选择照片并提交；没有 Arduino 时也可以直接选择“使用演示观察”。
+4. 小程序会把照片交给电脑上的本地后端，由后端安全调用 Kimi；正常分析通常需要十几到几十秒，请等待页面跳转，不要重复点击。
+
+真实分析结果中的服务标识为 `kimi-anthropic`、模型为 `k3`。如果外部 AI 超时且开启了 `DEMO_FALLBACK`，结果会明确标记为 `demo-fallback`，不会伪装成真实分析。Kimi 凭证只保存在电脑端，微信小程序和 Arduino 都不会接触密钥。
 
 ## Arduino 接线
 
@@ -206,7 +233,7 @@ arduino-cli upload -p COM3 --fqbn arduino:avr:uno .\firmware\bug_atlas_station
 
 ## 导入微信小程序
 
-1. 启动本地后端并保持 `http://127.0.0.1:3050` 可访问。
+1. 启动本地后端并保持 `http://127.0.0.1:3150` 可访问。
 2. 打开微信开发者工具，选择“导入项目”，目录选仓库根目录。
 3. 首次导入选择“测试号”，或在 `project.config.json` 中填写自己的 AppID。
 4. 本地调试阶段确认“不校验合法域名、web-view（业务域名）、TLS 版本以及 HTTPS 证书”已启用。
@@ -246,17 +273,38 @@ pnpm test
 
 自动测试覆盖 CRC、噪声/拆包/粘包、错误帧恢复、核心 API、观察流程和演示模式端到端路径。当前验证明细见 [`VALIDATION.md`](VALIDATION.md)。
 
-尚需在目标现场完成的验收包括：Arduino 实机上传与 30 分钟连续采集、USB 拔插重连、微信开发者工具模拟器视觉检查，以及真实 Kimi 多模态接口的稳定性测试。
+尚需在目标现场完成的验收包括：Arduino 实机上传与 30 分钟连续采集、USB 拔插重连，以及微信开发者工具真机视觉检查。真实 Kimi 多模态接口已完成一次端到端联通验证，但正式演示前仍建议使用现场网络再测一次稳定性。
 
 ## 常见问题
+
+### 点击“请 AI 导师分析”后立即提示“本地服务暂时无法完成请求”
+
+旧版小程序会给分析请求声明 JSON 类型，却没有发送 JSON 请求体，后端因此会在调用 Kimi 之前立即返回 400。当前版本已经修复：无参数的 POST 请求也会发送 `{}`。更新代码后请在微信开发者工具中点击“编译”；如仍出现旧提示，可再执行“工具 → 清除缓存 → 清除全部缓存”后重新编译。
+
+如果提示不是立即出现，而是在等待几十秒后出现，请查看 `server/data/logs/backend-error.log`。这通常属于外部 AI 网络超时；观察记录仍会保留，并可在网络恢复后重试。
 
 ### A0 一直是 0 或 1023
 
 先检查中间节点是否同时连接了光敏电阻、10kΩ 电阻和 A0。持续极值通常表示分压接错、断路或短路；固件会在持续饱和后把光照标记为无效。
 
-### 后端提示端口 3050 已占用
+### 后端提示端口 3150 已占用
 
-先运行 `stop-backend.ps1`。如果没有本项目 PID 文件，检查占用进程，或在 `.env.local` 中修改 `PORT`，并同步修改小程序 API 地址。
+通常是已经运行了 `start-backend.ps1`，随后又执行了 `pnpm start` 或 `pnpm dev`。先执行：
+
+```powershell
+.\stop-backend.ps1
+```
+
+如果之前使用的是前台 `pnpm start` / `pnpm dev`，也可以回到对应终端按 `Ctrl+C`。确认只保留一种启动方式后，再重新运行 `start-backend.ps1`。
+
+仍然冲突时，可查看 3150 的监听进程：
+
+```powershell
+Get-NetTCPConnection -LocalPort 3150 -State Listen |
+  Select-Object LocalAddress, LocalPort, OwningProcess
+```
+
+默认不要随意修改端口，因为后端、启动/关闭脚本和小程序已经统一使用 `3150`。确实需要自定义时，必须同时更新 `.env.local` 的 `PORT` 和小程序设置页的 API 地址（完整格式如 `http://127.0.0.1:3151/api/v1`）。
 
 ### 找不到 Arduino 串口
 

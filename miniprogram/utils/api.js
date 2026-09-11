@@ -1,21 +1,30 @@
+const { normalizeApiBase } = require('./config');
+
 function base() {
-  return getApp().globalData.apiBase.replace(/\/$/, '');
+  return normalizeApiBase(getApp().globalData.apiBase);
 }
 
 function absolute(url) {
   if (!url) return '';
   if (/^https?:\/\//.test(url)) return url;
-  return `${base()}${url.replace(/^\/api\/v1/, '')}`;
+  const path = url.replace(/^\/api\/v1/, '');
+  return `${base()}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
 function request(path, options = {}) {
   return new Promise((resolve, reject) => {
+    const method = String(options.method || 'GET').toUpperCase();
+    const needsJsonBody = ['POST', 'PUT', 'PATCH'].includes(method);
+    const data = options.data === undefined && needsJsonBody ? {} : options.data;
+    const header = data === undefined
+      ? { ...(options.header || {}) }
+      : { 'content-type': 'application/json', ...(options.header || {}) };
     wx.request({
       url: absolute(path),
-      method: options.method || 'GET',
-      data: options.data,
+      method,
+      ...(data === undefined ? {} : { data }),
       timeout: options.timeout || 10000,
-      header: { 'content-type': 'application/json', ...(options.header || {}) },
+      header,
       success(response) {
         if (response.statusCode >= 200 && response.statusCode < 300 && response.data?.success) resolve(response.data.data);
         else reject(response.data?.error || { code: 'HTTP_ERROR', message: `本地服务返回 ${response.statusCode}` });
@@ -73,4 +82,9 @@ async function waitForJob(jobId, options = {}) {
 
 function messageOf(error) { return error?.message || '操作未完成，请稍后重试'; }
 
-module.exports = { absolute, request, uploadObservation, uploadAudio, waitForJob, messageOf };
+function diagnosticOf(error) {
+  const message = messageOf(error);
+  return error?.detail ? `${message}：${error.detail}` : message;
+}
+
+module.exports = { absolute, request, uploadObservation, uploadAudio, waitForJob, messageOf, diagnosticOf };

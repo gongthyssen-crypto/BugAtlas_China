@@ -2,6 +2,19 @@ import { EventEmitter } from 'node:events';
 import { SerialPort } from 'serialport';
 import { FrameParser, MessageType, decodeHello, decodeSensorReport, createConfigFrame, encodeFrame, Flags } from '../protocol/frame.js';
 
+function serialOpenError(portPath, error) {
+  const detail = String(error?.message || error || 'Unknown serial error');
+  const busy = /access denied|permission denied|resource busy|ebusy/i.test(detail);
+  const wrapped = new Error(detail, { cause: error });
+  wrapped.code = busy ? 'SERIAL_PORT_BUSY' : 'SERIAL_PORT_OPEN_FAILED';
+  wrapped.statusCode = busy ? 409 : 503;
+  wrapped.retryable = true;
+  wrapped.publicMessage = busy
+    ? `无法打开 ${portPath}：串口被其他程序占用。请关闭 Arduino IDE 的串口监视器/绘图器后重试。`
+    : `无法打开 ${portPath}。请检查 USB 数据线、驱动和端口是否仍然存在。`;
+  return wrapped;
+}
+
 export class SerialBridge extends EventEmitter {
   constructor({ stationId, onSnapshot, logger }) {
     super();
@@ -36,8 +49,9 @@ export class SerialBridge extends EventEmitter {
     try {
       return await this.openPort();
     } catch (error) {
-      this.scheduleReconnect();
-      throw error;
+      const wrapped = serialOpenError(portPath, error);
+      await this.disconnect();
+      throw wrapped;
     }
   }
 

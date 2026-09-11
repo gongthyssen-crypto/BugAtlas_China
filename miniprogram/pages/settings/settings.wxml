@@ -12,23 +12,33 @@
       <view><text>语音</text><strong>{{health.adapters.tts}}</strong></view>
     </view>
   </view>
-  <view class="card empty" wx:else>本地服务未连接。请先在项目根目录执行 <text class="rust">pnpm start</text>。</view>
+  <view class="card connection-error" wx:else>
+    <view class="sub-title">本地后端未连接</view>
+    <view class="muted">请在项目根目录运行 <text class="rust">.\start-backend.ps1</text>；不需要再执行 pnpm start。</view>
+    <view class="diagnostic-url">检查地址：{{apiBase}}/health</view>
+    <view class="error-detail" wx:if="{{backendError}}">{{backendError}}</view>
+  </view>
 
   <view class="card mode-card" wx:if="{{health}}">
-    <view><view class="sub-title">演示模式</view><view class="muted">不依赖 Arduino 和外网，数据永久标注为演示。</view></view>
+    <view><view class="sub-title">演示传感器</view><view class="muted">不依赖 Arduino，传感器数据标注为演示；已配置的 AI 仍由本地后端联网调用。</view></view>
     <switch color="#a95031" checked="{{health.mode === 'demo'}}" bindchange="modeChange" />
   </view>
 
   <view class="section-title">Arduino UNO</view>
   <view class="card serial-card">
-    <view class="serial-status"><view class="source-badge source-{{health.serial.dataState || 'offline'}}">{{health.serial.connected ? '串口已打开' : '设备未连接'}}</view><text>{{health.serial.port || '等待选择 COM 口'}}</text></view>
+    <view class="serial-status"><view class="source-badge source-{{serial.dataState || 'offline'}}">{{serial.connected ? (serial.online ? '实时数据' : '串口已打开') : '串口未打开'}}</view><text>{{serial.port || '等待选择 COM 口'}}</text></view>
     <view class="field"><text class="label">可用串口</text><picker mode="selector" range="{{ports}}" range-key="port" value="{{portIndex}}" bindchange="portChange"><view class="picker-field">{{ports.length ? ports[portIndex].port : '没有发现串口'}} <text>⌄</text></view></picker></view>
-    <button class="btn btn-secondary" disabled="{{!ports.length || connecting}}" bindtap="connect">{{connecting ? '正在等待 HELLO…' : '连接 115200 bps'}}</button>
-    <view wx:if="{{health.serial.stats}}" class="protocol-stats"><view><text>有效帧</text>{{health.serial.stats.validFrames}}</view><view><text>CRC 错误</text>{{health.serial.stats.crcErrors}}</view><view><text>丢序号</text>{{health.serial.stats.droppedSequences}}</view></view>
+    <view class="port-detail" wx:if="{{ports.length && ports[portIndex].manufacturer}}">{{ports[portIndex].manufacturer}}</view>
+    <view class="error-detail" wx:if="{{portsError}}">串口枚举失败：{{portsError}}</view>
+    <view class="muted serial-help" wx:elif="{{health && !ports.length}}">后端已连接，但 Windows 没有枚举到串口。请检查 USB 数据线和设备管理器。</view>
+    <button class="btn btn-secondary" disabled="{{!health || !ports.length || connecting}}" bindtap="connect">{{connecting ? '正在打开串口…' : '由后端连接所选串口 · 115200 bps'}}</button>
+    <view class="error-detail" wx:if="{{serialError}}">{{serialError}}</view>
+    <view wx:if="{{serial.stats}}" class="protocol-stats"><view><text>有效帧</text>{{serial.stats.validFrames}}</view><view><text>CRC 错误</text>{{serial.stats.crcErrors}}</view><view><text>丢序号</text>{{serial.stats.droppedSequences}}</view></view>
+    <view class="notice">COM 口由 Windows 后端枚举和打开，不是微信模拟器直接访问。连接前请关闭 Arduino IDE 的串口监视器和串口绘图器。</view>
   </view>
 
   <view class="section-title">本地服务地址</view>
-  <input class="input" value="{{apiBase}}" bindblur="saveBase" />
-  <button class="refresh" bindtap="refresh">↻ 重新检查全部状态</button>
+  <input class="input" value="{{apiBase}}" confirm-type="done" bindblur="saveBase" bindconfirm="saveBase" />
+  <view class="address-actions"><button class="refresh" bindtap="refresh">↻ 重新检查</button><button class="refresh" bindtap="resetBase">恢复本机默认地址</button></view>
   <view class="notice">服务只监听 127.0.0.1，不应暴露到公网。上游 API 密钥只保存在电脑环境变量中，小程序永远不会读取它们。</view>
 </view>

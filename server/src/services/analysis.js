@@ -1,4 +1,3 @@
-import fs from 'node:fs/promises';
 import sharp from 'sharp';
 import { z } from 'zod';
 
@@ -74,16 +73,32 @@ function promptFor(observation) {
 }
 
 export async function analyzeObservation({ config, observation, imagePath }) {
-  if (config.demoMode || !config.kimi.apiKey) return demoAnalysis(observation);
-  const image = await fs.readFile(imagePath);
-  const metadata = await sharp(image).metadata();
-  const mediaType = metadata.format === 'png' ? 'image/png' : 'image/jpeg';
+  // Sensor demo mode only changes where observations come from. When a Kimi
+  // credential is configured, demo observations should still receive a real
+  // AI analysis so local development works without an attached Arduino.
+  if (!config.kimi.apiKey) return demoAnalysis(observation);
+  const sourceImage = await sharp(imagePath).rotate().toBuffer();
+  const imageProfiles = [
+    { edge: 1600, quality: 78 },
+    { edge: 1400, quality: 70 },
+    { edge: 1200, quality: 64 }
+  ];
+  let image;
+  for (const profile of imageProfiles) {
+    image = await sharp(sourceImage)
+      .resize({ width: profile.edge, height: profile.edge, fit: 'inside', withoutEnlargement: true })
+      .jpeg({ quality: profile.quality, mozjpeg: true })
+      .toBuffer();
+    if (image.length <= 384 * 1024) break;
+  }
+  const mediaType = 'image/jpeg';
   const headers = { 'content-type': 'application/json', 'anthropic-version': '2023-06-01' };
   if (config.kimi.authMode === 'bearer') headers.authorization = `Bearer ${config.kimi.apiKey}`;
   else headers['x-api-key'] = config.kimi.apiKey;
   const requestBody = JSON.stringify({
     model: config.kimi.model,
     max_tokens: 1800,
+    thinking: { type: 'disabled' },
     system: '你是谨慎的儿童博物教育助手，只输出符合给定 JSON 字段的数据。',
     messages: [{
       role: 'user',

@@ -14,3 +14,10 @@
 .protocol-stats view { padding: 22rpx 10rpx 0; text-align: center; font-size: 29rpx; font-weight: 700; }
 .refresh { margin-top: 24rpx; color: #a95031; background: transparent; font-family: inherit; font-size: 23rpx; }
 .refresh::after { border: 0; }
+.connection-error { padding: 30rpx; border-color: #b66a4e; }
+.connection-error .muted { margin-top: 14rpx; line-height: 1.7; }
+.diagnostic-url { margin-top: 18rpx; color: #596052; font-size: 21rpx; overflow-wrap: anywhere; }
+.error-detail { margin-top: 18rpx; padding: 18rpx 20rpx; border-left: 6rpx solid #a95031; background: #f3ddd1; color: #713c2c; font-size: 21rpx; line-height: 1.6; overflow-wrap: anywhere; }
+.port-detail, .serial-help { margin-top: 12rpx; font-size: 21rpx; }
+.address-actions { display: flex; align-items: center; justify-content: space-between; gap: 16rpx; }
+.address-actions .refresh { flex: 1; padding: 0; }

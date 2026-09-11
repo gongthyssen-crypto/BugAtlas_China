@@ -1,16 +1,57 @@
-$ErrorActionPreference = 'Stop'
+﻿$ErrorActionPreference = 'Stop'
+$utf8 = [System.Text.UTF8Encoding]::new($false)
+[Console]::InputEncoding = $utf8
+[Console]::OutputEncoding = $utf8
+$OutputEncoding = $utf8
+if ($env:OS -eq 'Windows_NT') { & "$env:SystemRoot\System32\chcp.com" 65001 | Out-Null }
+
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $dataDir = Join-Path $projectRoot 'server\data'
 $logDir = Join-Path $dataDir 'logs'
 $pidFile = Join-Path $dataDir 'backend.pid'
+$healthUrl = 'http://127.0.0.1:3150/api/v1/health'
+
+function Test-BugAtlasProcess([int]$ProcessId) {
+  $info = Get-CimInstance Win32_Process -Filter "ProcessId = $ProcessId" -ErrorAction SilentlyContinue
+  if (-not $info -or $info.Name -notmatch '^node(\.exe)?$') { return $false }
+  $command = ($info.CommandLine -replace '/', '\').ToLowerInvariant()
+  return $command -like '*src\index.js*'
+}
+
+function Find-HealthyBackend {
+  try {
+    $health = Invoke-RestMethod -Uri $healthUrl -TimeoutSec 2
+    $validService = $health.success -and $health.data.status -eq 'ok' -and (
+      $health.data.serviceId -eq 'bug-atlas-china-local' -or $health.data.version -eq '0.1.0'
+    )
+    if (-not $validService) { return $null }
+    $listeners = @(Get-NetTCPConnection -LocalAddress '127.0.0.1' -LocalPort 3150 -State Listen -ErrorAction SilentlyContinue)
+    foreach ($listener in $listeners) {
+      if (Test-BugAtlasProcess $listener.OwningProcess) {
+        return Get-CimInstance Win32_Process -Filter "ProcessId = $($listener.OwningProcess)"
+      }
+    }
+  } catch {}
+  return $null
+}
 
 New-Item -ItemType Directory -Path $logDir -Force | Out-Null
 
+$healthyBackend = Find-HealthyBackend
+if ($healthyBackend) {
+  Set-Content -LiteralPath $pidFile -Value $healthyBackend.ProcessId -Encoding ascii
+  Write-Host "虫迹中国后端已经在运行：http://127.0.0.1:3150" -ForegroundColor Yellow
+  Write-Host "PID: $($healthyBackend.ProcessId)"
+  Write-Host '无需再执行 pnpm start；现在可回到小程序点击“重新检查”。' -ForegroundColor Cyan
+  exit 0
+}
+
 if (Test-Path -LiteralPath $pidFile) {
   $existingPid = [int](Get-Content -Raw -LiteralPath $pidFile)
-  if (Get-Process -Id $existingPid -ErrorAction SilentlyContinue) {
-    Write-Host "后端已经在运行，PID: $existingPid" -ForegroundColor Yellow
-    exit 0
+  if (Test-BugAtlasProcess $existingPid) {
+    Write-Host "检测到后端进程 PID $existingPid，但健康检查未通过。" -ForegroundColor Red
+    Write-Host "请查看日志：$logDir" -ForegroundColor Red
+    exit 1
   }
   Remove-Item -LiteralPath $pidFile -Force
 }
@@ -37,7 +78,7 @@ if (Test-Path -LiteralPath $imageFile) {
 }
 
 if (-not (Test-Path -LiteralPath (Join-Path $projectRoot 'server\node_modules'))) {
-  Write-Host '首次运行，正在安装后端依赖…' -ForegroundColor Cyan
+  Write-Host '首次运行，正在安装后端依赖……' -ForegroundColor Cyan
   Push-Location $projectRoot
   try { & pnpm install } finally { Pop-Location }
 }
@@ -59,7 +100,7 @@ for ($attempt = 0; $attempt -lt 30; $attempt++) {
   Start-Sleep -Milliseconds 250
   if ($process.HasExited) { break }
   try {
-    $health = Invoke-RestMethod -Uri 'http://127.0.0.1:3050/api/v1/health' -TimeoutSec 1
+    $health = Invoke-RestMethod -Uri $healthUrl -TimeoutSec 1
     if ($health.success) { $ready = $true; break }
   } catch {}
 }
@@ -67,12 +108,16 @@ for ($attempt = 0; $attempt -lt 30; $attempt++) {
 if (-not $ready) {
   if (-not $process.HasExited) { Stop-Process -Id $process.Id -Force }
   Remove-Item -LiteralPath $pidFile -Force -ErrorAction SilentlyContinue
-  Write-Host "后端启动失败，请查看：$stderrLog" -ForegroundColor Red
+  Write-Host '后端启动失败。' -ForegroundColor Red
+  Write-Host "错误日志：$stderrLog" -ForegroundColor Red
   exit 1
 }
 
-$imageMode = if ($env:IMAGE_API_KEY) { 'IMAGE-2 凭证已载入，将生成真实 AI 插画' } else { '未找到 IMAGE-2 凭证，将明确回退原始照片' }
-Write-Host '虫迹中国后端已启动：http://127.0.0.1:3050' -ForegroundColor Green
+$kimiMode = if ($env:KIMI_ANTHROPIC_API_KEY) { 'Kimi 凭证已载入，本地后端将调用真实 AI 导师。' } else { '未找到 Kimi 凭证，AI 导师将明确使用演示分析。' }
+$imageMode = if ($env:IMAGE_API_KEY) { 'IMAGE-2 凭证已载入，将生成真实 AI 插画。' } else { '未找到 IMAGE-2 凭证，将明确回退原始照片。' }
+Write-Host '虫迹中国后端已启动：http://127.0.0.1:3150' -ForegroundColor Green
 Write-Host "PID: $($process.Id)"
+Write-Host $kimiMode -ForegroundColor Cyan
 Write-Host $imageMode -ForegroundColor Cyan
 Write-Host "日志目录：$logDir"
+Write-Host '无需再执行 pnpm start；现在可打开微信开发者工具。' -ForegroundColor Cyan

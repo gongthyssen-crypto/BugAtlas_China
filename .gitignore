@@ -13,6 +13,7 @@ data/
 server/data/
 .pnpm-store/
 project.private.config.json
+miniprogram/project.config.json
 
 # Firmware build output and local tools
 firmware/**/build/

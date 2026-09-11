@@ -1,10 +1,14 @@
+const { DEFAULT_API_BASE, LEGACY_API_BASE, normalizeApiBase } = require('./utils/config');
+
 App({
   globalData: {
-    apiBase: 'http://127.0.0.1:3050/api/v1',
+    apiBase: DEFAULT_API_BASE,
     currentObservationId: null
   },
   onLaunch() {
     const savedBase = wx.getStorageSync('apiBase');
-    if (savedBase) this.globalData.apiBase = savedBase.replace(/\/$/, '');
+    const normalized = normalizeApiBase(savedBase || DEFAULT_API_BASE);
+    this.globalData.apiBase = normalized === LEGACY_API_BASE ? DEFAULT_API_BASE : normalized;
+    wx.setStorageSync('apiBase', this.globalData.apiBase);
   }
 });

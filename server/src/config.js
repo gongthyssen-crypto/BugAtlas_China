@@ -18,7 +18,7 @@ export function createConfig(overrides = {}) {
     serverDir,
     dataDir,
     host: overrides.host ?? process.env.HOST ?? '127.0.0.1',
-    port: Number(overrides.port ?? process.env.PORT ?? 3050),
+    port: Number(overrides.port ?? process.env.PORT ?? 3150),
     stationId: overrides.stationId ?? process.env.STATION_ID ?? 'BJ-MTG-SJMZ-01',
     demoMode: overrides.demoMode ?? bool(process.env.DEMO_MODE, true),
     demoFallback: overrides.demoFallback ?? bool(process.env.DEMO_FALLBACK, true),

@@ -82,6 +82,7 @@ export async function buildApp({ config, logger = true } = {}) {
 
   app.setErrorHandler((error, request, reply) => {
     if (error.statusCode === 413) return reply.code(413).send(apiError(request, 'UPLOAD_TOO_LARGE', '文件不得超过 10 MB'));
+    if (error.code === 'FST_ERR_CTP_EMPTY_JSON_BODY') return reply.code(400).send(apiError(request, 'REQUEST_BODY_REQUIRED', '请求缺少 JSON 内容'));
     if (error.validation) return reply.code(400).send(apiError(request, 'REQUEST_INVALID', '请求参数不完整或格式错误'));
     request.log.error({ requestId: request.id, errorCode: error.code ?? 'INTERNAL_ERROR', message: error.message }, 'Request failed');
     return reply.code(error.statusCode ?? 500).send(apiError(request, error.code ?? 'INTERNAL_ERROR', error.publicMessage ?? '本地服务暂时无法完成请求', Boolean(error.retryable)));
@@ -90,6 +91,7 @@ export async function buildApp({ config, logger = true } = {}) {
   app.get('/', async (_request, reply) => reply.type('text/html; charset=utf-8').send(`<!doctype html><meta charset="utf-8"><title>虫迹中国本地服务</title><style>body{font:18px/1.7 Georgia,"Microsoft YaHei";max-width:760px;margin:12vh auto;color:#263022;background:#f3eddc}code{background:#dfe2cf;padding:.15em .4em}</style><h1>虫迹中国 · 本地服务</h1><p>串口桥接、AI、语音和作品服务正在运行。</p><p>健康检查：<code>/api/v1/health</code></p>`));
 
   app.get('/api/v1/health', async request => apiSuccess(request, {
+    serviceId: 'bug-atlas-china-local',
     status: 'ok',
     mode: demoMode ? 'demo' : 'live',
     database: 'ok',
@@ -118,7 +120,7 @@ export async function buildApp({ config, logger = true } = {}) {
     const ports = await serialBridge.listPorts();
     return apiSuccess(request, ports.map(port => ({
       port: port.path, manufacturer: port.manufacturer ?? null, serialNumber: port.serialNumber ?? null,
-      vendorId: port.vendorId ?? null, productId: port.productId ?? null
+      vendorId: port.vendorId ?? null, productId: port.productId ?? null, friendlyName: port.friendlyName ?? null
     })));
   });
   app.post('/api/v1/serial/connect', {
