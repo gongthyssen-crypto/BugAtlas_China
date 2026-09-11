@@ -1,0 +1,2021 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e7ebe2" />
+  <title>虫宿博物志｜好奇自然 · 智能昆虫旅馆创客马拉松</title>
+  <style>
+    :root {
+      --ink: #26372f;
+      --green: #455f4d;
+      --green-2: #708775;
+      --sage: #a8b7a8;
+      --paper: #f4f3ec;
+      --paper-warm: #ebe9df;
+      --blue: #66879a;
+      --blue-soft: #dce6e8;
+      --amber: #b7864b;
+      --rust: #a6654d;
+      --line: rgba(50, 74, 60, .22);
+      --panel: rgba(245, 246, 239, .68);
+      --serif: "Songti SC", "STSong", "SimSun", "Noto Serif CJK SC", serif;
+      --sans: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #cfd7ce;
+      color: var(--ink);
+      font-family: var(--sans);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .18;
+      background-image:
+        repeating-linear-gradient(0deg, transparent 0 3px, rgba(36, 57, 44, .03) 3px 4px),
+        repeating-linear-gradient(90deg, transparent 0 5px, rgba(255,255,255,.09) 5px 6px);
+      mix-blend-mode: multiply;
+    }
+
+    button { font: inherit; }
+
+    .viewport {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    .deck {
+      position: relative;
+      width: min(100vw, 177.777vh);
+      height: min(100vh, 56.25vw);
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 86% 8%, rgba(201, 214, 201, .82), transparent 26%),
+        radial-gradient(circle at 10% 92%, rgba(214, 222, 214, .66), transparent 30%),
+        linear-gradient(135deg, var(--paper) 0%, #eef1e9 54%, var(--paper-warm) 100%);
+      box-shadow: 0 28px 90px rgba(28, 45, 34, .25);
+    }
+
+    .deck::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      box-shadow: inset 0 0 0 1px rgba(46, 67, 53, .14);
+    }
+
+    .topline {
+      position: absolute;
+      z-index: 70;
+      left: 3.2%;
+      right: 3.2%;
+      top: 3.4%;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .brand {
+      position: absolute;
+      z-index: 71;
+      left: 3.2%;
+      top: 1.15%;
+      margin: 0;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(9px, .72vw, 15px);
+      line-height: 1.2;
+      letter-spacing: .24em;
+    }
+
+    .progress-track {
+      position: absolute;
+      z-index: 72;
+      left: 3.2%;
+      top: calc(3.4% - 1px);
+      width: 93.6%;
+      height: 3px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      width: 9.09%;
+      height: 100%;
+      background: var(--green);
+      transform-origin: left center;
+      transition: width .55s cubic-bezier(.22,.7,.2,1);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 3vh;
+      padding: 8vh 5.4vw 7.3vh;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateX(3.5%);
+      transition:
+        opacity .42s ease,
+        transform .62s cubic-bezier(.22,.7,.2,1),
+        visibility 0s linear .62s;
+    }
+
+    .slide.active {
+      z-index: 2;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(0);
+      transition-delay: 0s;
+    }
+
+    .slide.leaving-left { transform: translateX(-3.5%); }
+
+    .slide::before {
+      content: attr(data-mark);
+      position: absolute;
+      right: 3.5vw;
+      bottom: 5vh;
+      color: rgba(65, 92, 72, .05);
+      font: 900 20vw/1 var(--serif);
+      letter-spacing: -.08em;
+      pointer-events: none;
+    }
+
+    .slide-head {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 2vw;
+    }
+
+    .eyebrow {
+      margin: 0 0 .9rem;
+      color: var(--green-2);
+      font-size: clamp(10px, .78vw, 16px);
+      font-weight: 700;
+      letter-spacing: .23em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1, h2 {
+      margin-bottom: 0;
+      color: var(--green);
+      font-family: var(--serif);
+      font-weight: 900;
+      letter-spacing: -.01em;
+      line-height: 1.28;
+    }
+
+    h1 { font-size: clamp(44px, 6.2vw, 118px); }
+    h2 { font-size: clamp(34px, 4.4vw, 84px); }
+
+    .deck-label {
+      align-self: center;
+      padding-bottom: .4em;
+      color: var(--green-2);
+      font-family: var(--serif);
+      font-size: clamp(11px, .9vw, 18px);
+      letter-spacing: .16em;
+      white-space: nowrap;
+    }
+
+    .body-copy {
+      color: #405147;
+      font-family: var(--serif);
+      font-size: clamp(14px, 1.3vw, 25px);
+      line-height: 1.8;
+    }
+
+    .muted { color: #738077; }
+    .accent { color: var(--rust); }
+    .blue { color: var(--blue); }
+
+    .panel {
+      border: 1px solid rgba(73, 97, 78, .16);
+      border-radius: 1.8vw;
+      background: var(--panel);
+      box-shadow: 0 12px 38px rgba(54, 75, 60, .055);
+      backdrop-filter: blur(10px);
+    }
+
+    .panel-label {
+      color: var(--green-2);
+      font-size: clamp(9px, .72vw, 14px);
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .art-svg { width: 100%; height: 100%; overflow: visible; }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+
+    .active .reveal {
+      animation: reveal .72s cubic-bezier(.2,.72,.22,1) forwards;
+      animation-delay: var(--delay, .08s);
+    }
+
+    @keyframes reveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---------- Slide 01 封面 ---------- */
+    .cover {
+      grid-template-rows: 1fr;
+      padding-top: 7vh;
+    }
+
+    .cover-grid {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      align-items: center;
+      gap: 3vw;
+      height: 100%;
+    }
+
+    .cover-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: .7em;
+      margin-bottom: 3vh;
+      color: var(--green-2);
+      font-size: clamp(11px, .9vw, 18px);
+      font-weight: 700;
+      letter-spacing: .28em;
+    }
+
+    .cover-kicker::before {
+      content: "";
+      width: 3.2em;
+      height: 1px;
+      background: currentColor;
+    }
+
+    .cover h1 span { display: block; }
+    .cover h1 .en {
+      color: var(--green-2);
+      font-size: .52em;
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
+    .cover h1 .thin {
+      margin-top: 1.1em;
+      color: var(--ink);
+      font-size: .3em;
+      font-weight: 400;
+      letter-spacing: .14em;
+      white-space: nowrap;
+    }
+
+    .cover-sub {
+      margin: 3.2vh 0 3.6vh;
+      color: #4d5d53;
+      font-family: var(--serif);
+      font-size: clamp(14px, 1.3vw, 25px);
+      line-height: 1.75;
+    }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: .65vw; }
+
+    .tag {
+      padding: .62em 1.05em;
+      border: 1px solid rgba(66, 89, 73, .22);
+      border-radius: 999px;
+      color: #52655a;
+      background: rgba(255,255,255,.34);
+      font-size: clamp(9px, .74vw, 14px);
+      letter-spacing: .08em;
+    }
+
+    .cover-art {
+      position: relative;
+      height: 86%;
+      min-height: 320px;
+    }
+
+    .cover-note {
+      position: absolute;
+      left: 4%;
+      bottom: 0;
+      z-index: 3;
+      margin: 0;
+      padding-left: 1em;
+      border-left: 2px solid var(--amber);
+      color: #647269;
+      font-family: var(--serif);
+      font-size: clamp(10px, .85vw, 16px);
+      line-height: 1.8;
+    }
+
+    /* ---------- Slide 02 活动初衷 ---------- */
+    .intent-grid {
+      display: grid;
+      grid-template-columns: 1.02fr .98fr;
+      gap: 2.6vw;
+      min-height: 0;
+    }
+
+    .intent-panel {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2vh;
+      padding: 2.8vw;
+      overflow: hidden;
+    }
+
+    .intent-panel::after {
+      content: "";
+      position: absolute;
+      right: -8%;
+      bottom: -32%;
+      width: 62%;
+      aspect-ratio: 1;
+      border: 1px solid rgba(74, 101, 79, .14);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .quote-main {
+      position: relative;
+      z-index: 2;
+      margin: 0;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(20px, 2.2vw, 42px);
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .quote-main em {
+      color: var(--rust);
+      font-style: normal;
+    }
+
+    .intent-panel .body-copy { position: relative; z-index: 2; margin: 0; }
+
+    .intent-right {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 1.8vh;
+      min-height: 0;
+    }
+
+    .intent-lead {
+      padding: 1.5vw 1.8vw;
+      color: #506258;
+      font-family: var(--serif);
+      font-size: clamp(14px, 1.4vw, 27px);
+      line-height: 1.7;
+    }
+
+    .intent-points {
+      display: grid;
+      grid-template-rows: repeat(3, 1fr);
+      gap: 1.4vh;
+      min-height: 0;
+    }
+
+    .micro-card {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 1.4vw;
+      padding: 1.2vw 1.7vw;
+    }
+
+    .micro-card .mc-key {
+      color: var(--green-2);
+      font-size: clamp(9px, .72vw, 14px);
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      writing-mode: horizontal-tb;
+    }
+
+    .micro-card strong {
+      display: block;
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: clamp(14px, 1.3vw, 25px);
+      letter-spacing: .02em;
+    }
+
+    .micro-card span:last-child {
+      display: block;
+      margin-top: .3em;
+      color: #6c7971;
+      font-size: clamp(10px, .85vw, 16px);
+      line-height: 1.6;
+    }
+
+    /* ---------- Slide 03 课程载体 ---------- */
+    .carrier-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.4vw;
+      min-height: 0;
+    }
+
+    .carrier-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 1.8vw;
+      padding: 1.8vw 2.2vw;
+      overflow: hidden;
+    }
+
+    .carrier-card::after {
+      content: "";
+      position: absolute;
+      right: -14%;
+      top: -46%;
+      width: 46%;
+      aspect-ratio: 1;
+      border: 1px solid rgba(74, 101, 79, .12);
+      border-radius: 50%;
+    }
+
+    .carrier-num {
+      color: rgba(69, 95, 77, .25);
+      font: 900 clamp(42px, 4.4vw, 84px)/1 var(--serif);
+      letter-spacing: -.04em;
+    }
+
+    .carrier-card h3 {
+      margin: 0 0 .45em;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(18px, 1.85vw, 36px);
+      letter-spacing: .03em;
+    }
+
+    .carrier-card p {
+      margin: 0;
+      color: #5f6f66;
+      font-size: clamp(10px, .95vw, 18px);
+      line-height: 1.75;
+    }
+
+    .carrier-card .kw { color: var(--rust); font-weight: 700; }
+
+    /* ---------- Slide 04 真实硬件 ---------- */
+    .hardware-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 2.6vw;
+      min-height: 0;
+    }
+
+    .climate-art {
+      position: relative;
+      min-height: 0;
+      padding: 1.6vw;
+      overflow: hidden;
+    }
+
+    .climate-art svg { position: absolute; inset: 12% 6% 16%; width: 88%; height: 72%; }
+
+    .climate-caption {
+      position: absolute;
+      left: 6%;
+      bottom: 5%;
+      right: 6%;
+      margin: 0;
+      padding-left: 1em;
+      border-left: 2px solid var(--blue);
+      color: #53666a;
+      font-family: var(--serif);
+      font-size: clamp(10px, .9vw, 17px);
+      line-height: 1.7;
+    }
+
+    .data-stack {
+      display: grid;
+      grid-template-rows: repeat(3, 1fr) auto;
+      gap: 1.4vh;
+      min-height: 0;
+    }
+
+    .data-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1.2vw;
+      padding: 1.2vw 1.6vw;
+    }
+
+    .data-icon {
+      display: grid;
+      place-items: center;
+      width: 3.2vw;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: clamp(15px, 1.5vw, 29px);
+    }
+
+    .data-name {
+      color: #63736a;
+      font-size: clamp(11px, .95vw, 18px);
+      letter-spacing: .12em;
+    }
+
+    .data-value {
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(26px, 3.4vw, 64px);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.1;
+    }
+
+    .snapshot-note {
+      padding: 1.2vw 1.5vw;
+      border-left: 3px solid var(--amber);
+      color: #5d6b63;
+      font-family: var(--serif);
+      font-size: clamp(11px, 1vw, 19px);
+      line-height: 1.75;
+    }
+
+    /* ---------- Slide 05 AI 博物导师 ---------- */
+    .ai-grid {
+      display: grid;
+      grid-template-columns: .88fr 1.12fr;
+      gap: 2.6vw;
+      min-height: 0;
+    }
+
+    .ai-manifesto {
+      position: relative;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-rows: 1fr auto;
+      align-items: center;
+      gap: 1.6vh 2.2vw;
+      padding: 2.4vw;
+      overflow: hidden;
+    }
+
+    .ai-manifesto::after {
+      content: "";
+      position: absolute;
+      right: -12%;
+      top: -30%;
+      width: 55%;
+      aspect-ratio: 1;
+      border: 1px solid rgba(166, 101, 77, .18);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .ai-manifesto .giant {
+      position: relative;
+      z-index: 2;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(24px, 2.8vw, 50px);
+      font-weight: 900;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+
+    .ai-manifesto .giant span { color: var(--rust); }
+
+    .ai-list {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      gap: 1.6vh;
+    }
+
+    .ai-list div {
+      display: grid;
+      grid-template-columns: 1.9em 1fr;
+      gap: .7em;
+      color: #58675e;
+      font-size: clamp(11px, .95vw, 18px);
+      line-height: 1.6;
+    }
+
+    .ai-list b { color: var(--green); font-family: var(--serif); }
+
+    .ai-note {
+      position: relative;
+      z-index: 2;
+      grid-column: 1 / -1;
+      margin: 0;
+      padding-top: 1.6vh;
+      border-top: 1px dashed rgba(73, 97, 78, .3);
+      color: var(--green-2);
+      font-size: clamp(10px, .85vw, 16px);
+      line-height: 1.65;
+    }
+
+    /* ---------- Slide 07 自然来信 ---------- */
+    .pc-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 2.6vw;
+      align-items: stretch;
+      min-height: 0;
+    }
+
+    .pc-card {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 1.6vh;
+      padding: 1.6vw;
+      min-height: 0;
+    }
+
+    .pc-art {
+      position: relative;
+      min-height: 0;
+      border-radius: 10px;
+      background: linear-gradient(160deg, #eef0e6, #e3e9de);
+      overflow: hidden;
+    }
+
+    .pc-art .art-svg {
+      position: absolute;
+      inset: 6% 8%;
+      width: 84%;
+      height: 88%;
+    }
+
+    .pc-stamp {
+      position: absolute;
+      top: 7%;
+      right: 6%;
+      padding: .5em .7em;
+      border: 2px solid rgba(166, 101, 77, .75);
+      border-radius: 6px;
+      color: var(--rust);
+      font-family: var(--serif);
+      font-size: clamp(11px, .95vw, 18px);
+      font-weight: 700;
+      line-height: 1.35;
+      text-align: center;
+      transform: rotate(6deg);
+      background: rgba(244, 243, 236, .8);
+    }
+
+    .pc-info h3 {
+      margin: .35em 0 .5em;
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: clamp(16px, 1.5vw, 28px);
+      line-height: 1.35;
+    }
+
+    .pc-info p {
+      margin: 0;
+      color: #58675e;
+      font-size: clamp(11px, .95vw, 18px);
+      line-height: 1.7;
+    }
+
+    .pc-data {
+      display: flex;
+      gap: .6em;
+      margin-top: 1em;
+    }
+
+    .pc-data span {
+      padding: .35em .9em;
+      border: 1px solid rgba(73, 97, 78, .35);
+      border-radius: 999px;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(11px, .9vw, 17px);
+    }
+
+    .pc-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2.2vh;
+      min-height: 0;
+      padding: .8vh 0;
+    }
+
+    .pc-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 1.6vh 1.2vw;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .pc-item {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      padding: 1.1vw 1.3vw;
+    }
+
+    .pc-item b {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: 2.4em;
+      height: 2.4em;
+      border-radius: 50%;
+      background: var(--green);
+      color: #f4f3ec;
+      font-family: var(--serif);
+      font-size: clamp(13px, 1.1vw, 21px);
+    }
+
+    .pc-item span {
+      color: #4c5a51;
+      font-size: clamp(11px, .95vw, 18px);
+      line-height: 1.55;
+    }
+
+    .pc-note {
+      margin: 0;
+      padding-left: 1em;
+      border-left: 3px solid var(--amber);
+      color: var(--green-2);
+      font-family: var(--serif);
+      font-size: clamp(12px, 1vw, 19px);
+      line-height: 1.7;
+    }
+
+    .candidates {
+      display: grid;
+      grid-template-rows: repeat(3, 1fr) auto;
+      gap: 1.3vh;
+      min-height: 0;
+    }
+
+    .candidate {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1.3vw;
+      padding: 1.1vw 1.5vw;
+    }
+
+    .candidate-rank {
+      color: var(--green-2);
+      font-family: var(--serif);
+      font-size: clamp(24px, 2.6vw, 50px);
+      line-height: 1.1;
+    }
+
+    .candidate h3 {
+      margin: 0 0 .3em;
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: clamp(14px, 1.3vw, 25px);
+    }
+
+    .candidate p {
+      margin: 0;
+      color: #6c7971;
+      font-size: clamp(10px, .8vw, 15px);
+      line-height: 1.6;
+    }
+
+    .status {
+      padding: .5em .9em;
+      border-radius: 999px;
+      color: var(--rust);
+      background: rgba(180, 116, 83, .11);
+      font-size: clamp(9px, .72vw, 14px);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .ai-boundary {
+      display: flex;
+      align-items: center;
+      gap: .8em;
+      padding: 1.1vw 1.4vw;
+      color: #5e6d64;
+      font-size: clamp(10px, .9vw, 17px);
+      line-height: 1.6;
+    }
+
+    .ai-boundary::before {
+      content: "";
+      flex: 0 0 auto;
+      width: .72em;
+      height: .72em;
+      border: 2px solid var(--rust);
+      border-radius: 50%;
+    }
+
+    /* ---------- Slide 06 融合架构 ---------- */
+    .fusion-wrap {
+      display: grid;
+      grid-template-rows: 1fr auto auto;
+      gap: 1.8vh;
+      min-height: 0;
+    }
+
+    .fusion-flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+      align-items: stretch;
+      gap: .8vw;
+      min-height: 0;
+    }
+
+    .f-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1vh;
+      padding: 1.6vw 1.2vw;
+      text-align: center;
+    }
+
+    .f-orb {
+      display: grid;
+      place-items: center;
+      width: 3.4vw;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      color: var(--paper);
+      font-family: var(--serif);
+      font-size: clamp(14px, 1.3vw, 25px);
+      font-weight: 900;
+      background: var(--green);
+    }
+
+    .f-node:nth-child(3) .f-orb { background: var(--blue); }
+    .f-node:nth-child(5) .f-orb { background: var(--amber); }
+    .f-node:nth-child(7) .f-orb { background: var(--rust); }
+
+    .f-node h3 {
+      margin: 0;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(14px, 1.35vw, 26px);
+      letter-spacing: .02em;
+    }
+
+    .f-node p {
+      margin: 0;
+      color: #5f6f66;
+      font-size: clamp(9px, .8vw, 15px);
+      line-height: 1.7;
+    }
+
+    .f-arrow {
+      align-self: center;
+      color: var(--green-2);
+      font-family: var(--serif);
+      font-size: clamp(18px, 2vw, 38px);
+    }
+
+    .fusion-outputs {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 1.6vw;
+      padding: 1.1vw 1.6vw;
+    }
+
+    .output-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6vw;
+    }
+
+    .output-chips span {
+      padding: .55em 1.05em;
+      border: 1px solid rgba(66, 89, 73, .22);
+      border-radius: 999px;
+      color: #52655a;
+      background: rgba(255,255,255,.4);
+      font-size: clamp(10px, .82vw, 16px);
+      letter-spacing: .06em;
+    }
+
+    .fusion-note {
+      padding: 1vw 1.5vw;
+      border-left: 3px solid var(--rust);
+      color: #5d6b63;
+      font-family: var(--serif);
+      font-size: clamp(10px, .95vw, 18px);
+      line-height: 1.7;
+    }
+
+    /* ---------- Slide 07 城乡共学 ---------- */
+    .co-grid {
+      display: grid;
+      grid-template-columns: 1.02fr .98fr;
+      gap: 2.4vw;
+      min-height: 0;
+    }
+
+    .co-map {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 1vh;
+      padding: 2vw 2.2vw 1.4vw;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .co-quote {
+      position: relative;
+      z-index: 3;
+      margin: 0;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(16px, 1.6vw, 31px);
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .co-map .co-svg-wrap {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    .co-map svg { width: 100%; height: 100%; }
+
+    .co-right { display: grid; grid-template-rows: auto 1fr; gap: 2vh; min-height: 0; }
+
+    .co-lead {
+      padding: 1.7vw 1.9vw;
+      color: #506258;
+      font-family: var(--serif);
+      font-size: clamp(14px, 1.45vw, 28px);
+      line-height: 1.7;
+    }
+
+    .scenes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.1vw;
+      min-height: 0;
+    }
+
+    .scene {
+      position: relative;
+      padding: 1.4vw 1.5vw;
+      overflow: hidden;
+    }
+
+    .scene .num {
+      color: rgba(69, 95, 77, .22);
+      font: 900 clamp(26px, 2.9vw, 56px)/1 var(--serif);
+    }
+
+    .scene h3 {
+      margin: -.35em 0 .4em 1.5em;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(14px, 1.25vw, 24px);
+      letter-spacing: .02em;
+    }
+
+    .scene p {
+      margin: 0 0 0 2.2em;
+      color: #6c7971;
+      font-size: clamp(10px, .82vw, 16px);
+      line-height: 1.65;
+    }
+
+    /* ---------- Slide 08 三大目标 ---------- */
+    .goals-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.4vw;
+      min-height: 0;
+    }
+
+    .goal-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 1.8vh;
+      padding: 2.3vw 2.1vw;
+      overflow: hidden;
+    }
+
+    .goal-card::after {
+      content: "";
+      position: absolute;
+      right: -16%;
+      bottom: -40%;
+      width: 62%;
+      aspect-ratio: 1;
+      border: 1px solid rgba(74, 101, 79, .13);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .goal-tag {
+      align-self: flex-start;
+      padding: .55em 1.1em;
+      border-radius: 999px;
+      color: var(--paper);
+      background: var(--green);
+      font-size: clamp(9px, .74vw, 14px);
+      font-weight: 700;
+      letter-spacing: .18em;
+    }
+
+    .goal-card h3 {
+      position: relative;
+      z-index: 2;
+      margin: 0;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(19px, 1.95vw, 38px);
+      line-height: 1.45;
+      letter-spacing: .01em;
+    }
+
+    .goal-card p {
+      position: relative;
+      z-index: 2;
+      margin: 0;
+      color: #5d6c63;
+      font-family: var(--serif);
+      font-size: clamp(11px, 1vw, 19px);
+      line-height: 1.85;
+    }
+
+    .goal-foot {
+      position: relative;
+      z-index: 2;
+      margin-top: auto;
+      padding-top: 1.4vh;
+      border-top: 1px dashed rgba(73, 97, 78, .3);
+      color: var(--green-2);
+      font-size: clamp(9px, .76vw, 15px);
+      letter-spacing: .14em;
+    }
+
+    /* ---------- Slide 09 合作闭环 ---------- */
+    .loop-grid {
+      display: grid;
+      grid-template-columns: .92fr 1.08fr;
+      gap: 3vw;
+      align-items: stretch;
+      min-height: 0;
+    }
+
+    .loop-copy { align-self: center; }
+
+    .loop-copy .lead {
+      margin-bottom: 2.8vh;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(19px, 2.1vw, 41px);
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .loop-list { display: grid; gap: 1.2vh; }
+
+    .loop-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.1vw;
+      align-items: center;
+      padding: 1.05vw 1.3vw;
+    }
+
+    .loop-item b {
+      display: grid;
+      place-items: center;
+      width: 2.5vw;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      color: var(--paper);
+      background: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(12px, 1vw, 20px);
+    }
+
+    .loop-item span {
+      color: #596a60;
+      font-size: clamp(10px, .92vw, 18px);
+      line-height: 1.6;
+    }
+
+    .loop-item span strong { color: var(--ink); }
+
+    .loop-stage {
+      display: flex;
+      flex-direction: column;
+      gap: 1.4vh;
+      min-height: 0;
+      overflow: hidden;
+      padding: 1.8vw 2vw 1.6vw;
+    }
+
+    .loop-svg-wrap {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    .loop-svg-wrap svg { width: 86%; height: 100%; }
+
+    .loop-caption {
+      flex: 0 0 auto;
+      margin: 0;
+      padding-left: 1em;
+      border-left: 2px solid var(--rust);
+      color: #5e6d64;
+      font-family: var(--serif);
+      font-size: clamp(10px, .9vw, 17px);
+      line-height: 1.7;
+    }
+
+    /* ---------- Slide 10 未来期望 ---------- */
+    .future-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.4vw;
+      min-height: 0;
+    }
+
+    .future-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1.2vh;
+      padding: 1.9vw 2.2vw;
+      overflow: hidden;
+    }
+
+    .future-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--amber), transparent);
+      opacity: .6;
+    }
+
+    .future-card .f-tag {
+      color: var(--green-2);
+      font-size: clamp(9px, .74vw, 14px);
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .future-card h3 {
+      margin: 0;
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(18px, 1.85vw, 36px);
+      letter-spacing: .02em;
+      line-height: 1.4;
+    }
+
+    .future-card p {
+      margin: 0;
+      color: #5f6f66;
+      font-size: clamp(10px, .95vw, 18px);
+      line-height: 1.75;
+    }
+
+    .future-card .kw { color: var(--rust); font-weight: 700; }
+
+    /* ---------- Slide 11 结尾 ---------- */
+    .final-grid {
+      grid-row: 1 / -1;
+      display: grid;
+      grid-template-columns: 1.02fr .98fr;
+      align-items: center;
+      align-content: center;
+      gap: 4vw;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .final-title {
+      color: var(--green);
+      font-family: var(--serif);
+      font-size: clamp(34px, 4.6vw, 88px);
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 1.35;
+    }
+
+    .final-title .small {
+      display: block;
+      margin-bottom: .8em;
+      color: var(--ink);
+      font-size: clamp(12px, 1vw, 20px);
+      font-weight: 400;
+      letter-spacing: .2em;
+    }
+
+    .final-copy {
+      margin-top: 3.4vh;
+      padding-left: 1.25em;
+      border-left: 2px solid var(--amber);
+      color: #59695f;
+      font-family: var(--serif);
+      font-size: clamp(13px, 1.25vw, 24px);
+      line-height: 1.85;
+    }
+
+    .final-art {
+      position: relative;
+      height: 88%;
+      display: flex;
+      flex-direction: column;
+      gap: 2.4vh;
+      min-height: 0;
+    }
+
+    .final-art .art-svg {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+    }
+
+    .final-badges {
+      display: grid;
+      gap: 1.2vh;
+      width: 100%;
+    }
+
+    .final-badge {
+      padding: 1.1vh 1.4vw;
+      border: 1px solid rgba(60, 87, 67, .22);
+      border-radius: .7vw;
+      color: #3f5546;
+      background: rgba(247, 247, 241, .92);
+      font-family: var(--serif);
+      font-size: clamp(12px, 1.05vw, 20px);
+      font-weight: 700;
+      letter-spacing: .05em;
+    }
+
+    /* ---------- Controls ---------- */
+    .controls {
+      position: absolute;
+      z-index: 90;
+      left: 50%;
+      bottom: 2.2%;
+      display: flex;
+      align-items: center;
+      gap: .35vw;
+      padding: .38vw;
+      border: 1px solid rgba(61, 85, 68, .16);
+      border-radius: 999px;
+      background: rgba(242,244,237,.78);
+      box-shadow: 0 8px 26px rgba(41, 59, 46, .11);
+      backdrop-filter: blur(14px);
+      transform: translateX(-50%);
+    }
+
+    .control-btn {
+      display: grid;
+      place-items: center;
+      width: clamp(30px, 2.5vw, 46px);
+      aspect-ratio: 1;
+      border: 0;
+      border-radius: 50%;
+      color: var(--green);
+      background: transparent;
+      cursor: pointer;
+      transition: background .2s ease, transform .2s ease;
+    }
+
+    .control-btn:hover { background: rgba(79, 107, 85, .1); transform: translateY(-1px); }
+    .control-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+    .counter {
+      min-width: 5.6em;
+      color: #5f7166;
+      font: 700 clamp(9px, .68vw, 13px)/1 var(--sans);
+      letter-spacing: .12em;
+      text-align: center;
+    }
+
+    .side-hint {
+      position: absolute;
+      z-index: 70;
+      right: 3.2%;
+      bottom: 3%;
+      color: #829087;
+      font-size: clamp(8px, .62vw, 12px);
+      letter-spacing: .08em;
+    }
+
+    .nav-dotlist {
+      position: absolute;
+      z-index: 70;
+      left: 2.1%;
+      top: 50%;
+      display: grid;
+      gap: .45vw;
+      transform: translateY(-50%);
+    }
+
+    .nav-dot {
+      width: .35vw;
+      min-width: 5px;
+      aspect-ratio: 1;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(64, 91, 71, .22);
+      cursor: pointer;
+      transition: transform .25s ease, background .25s ease;
+    }
+
+    .nav-dot.active { background: var(--green); transform: scale(1.7); }
+
+    @media (max-width: 780px), (max-height: 520px) {
+      .brand, .side-hint, .nav-dotlist { display: none; }
+      .slide { padding-left: 4.4vw; padding-right: 4.4vw; }
+      .controls { bottom: 1.2%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+
+    @media print {
+      html, body { width: auto; height: auto; overflow: visible; background: #fff; }
+      body::before, .controls, .side-hint, .nav-dotlist, .topline, .brand, .progress-track { display: none !important; }
+      .viewport { position: static; display: block; }
+      .deck { width: 297mm; height: auto; overflow: visible; box-shadow: none; background: var(--paper); }
+      .slide, .slide.active {
+        position: relative;
+        width: 297mm;
+        height: 167mm;
+        page-break-after: always;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+      }
+      .reveal { opacity: 1 !important; transform: none !important; animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="viewport">
+    <main class="deck" id="deck" aria-label="虫宿博物志创客马拉松路演">
+      <div class="topline"></div>
+      <p class="brand">虫宿博物志 BugAtlas-China</p>
+      <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+
+      <!-- 01 封面 -->
+      <section class="slide cover active" data-mark="01" aria-label="封面">
+        <div class="cover-grid">
+          <div>
+            <div class="cover-kicker reveal" style="--delay:.08s">想象力山谷 · 好奇自然</div>
+            <h1 class="reveal" style="--delay:.17s">
+              <span>虫宿博物志</span>
+              <span class="en">BugAtlas-China</span>
+              <span class="thin">智能昆虫旅馆创客马拉松</span>
+            </h1>
+            <p class="cover-sub reveal" style="--delay:.28s">为乡村和城里的孩子，共同设计一堂“好奇自然”课。</p>
+            <div class="tag-row reveal" style="--delay:.38s">
+              <span class="tag">博物教育</span>
+              <span class="tag">城乡共创</span>
+              <span class="tag">自然明信片</span>
+              <span class="tag">深度观察与参与</span>
+            </div>
+          </div>
+
+          <div class="cover-art reveal" style="--delay:.23s">
+            <svg class="art-svg" viewBox="0 0 640 560" role="img" aria-label="博物图鉴风格抽象图形">
+              <defs>
+                <radialGradient id="halo" cx="50%" cy="46%" r="55%">
+                  <stop offset="0%" stop-color="#c9d6c7" stop-opacity=".85" />
+                  <stop offset="70%" stop-color="#d8e0d4" stop-opacity=".45" />
+                  <stop offset="100%" stop-color="#d8e0d4" stop-opacity="0" />
+                </radialGradient>
+              </defs>
+
+              <circle cx="330" cy="272" r="228" fill="url(#halo)" />
+
+              <g fill="none" stroke="#455f4d">
+                <circle cx="330" cy="272" r="188" stroke-width="1.1" opacity=".5" />
+                <circle cx="330" cy="272" r="148" stroke-width="1" opacity=".38" />
+                <circle cx="330" cy="272" r="108" stroke-width="1" opacity=".3" />
+                <circle cx="330" cy="272" r="66" stroke-width="1" opacity=".24" />
+              </g>
+
+              <g stroke="#708775" stroke-width="1.4" opacity=".55">
+                <path d="M330 72v16M330 456v16M130 272h16M514 272h16" />
+                <path d="M189 131l11 11M460 402l11 11M471 131l-11 11M200 402l-11 11" />
+              </g>
+
+              <path d="M330 84a188 188 0 0 1 162 93" fill="none" stroke="#a6654d" stroke-width="3" stroke-linecap="round" />
+              <path d="M162 332a188 188 0 0 0 60 84" fill="none" stroke="#b7864b" stroke-width="3" stroke-linecap="round" />
+
+              <ellipse cx="330" cy="272" rx="226" ry="150" fill="none" stroke="#708775" stroke-width="1" stroke-dasharray="3 8" opacity=".5" transform="rotate(-18 330 272)" />
+
+              <g>
+                <circle cx="496" cy="182" r="10" fill="#a6654d" />
+                <circle cx="496" cy="182" r="17" fill="none" stroke="#a6654d" stroke-width="1.2" opacity=".5" />
+                <circle cx="196" cy="392" r="8" fill="#b7864b" />
+                <circle cx="196" cy="392" r="14" fill="none" stroke="#b7864b" stroke-width="1.2" opacity=".5" />
+                <circle cx="452" cy="386" r="6" fill="#66879a" />
+                <circle cx="170" cy="196" r="6" fill="#455f4d" />
+                <circle cx="388" cy="116" r="5" fill="#708775" />
+              </g>
+
+              <circle cx="330" cy="272" r="26" fill="#455f4d" />
+              <circle cx="330" cy="272" r="38" fill="none" stroke="#455f4d" stroke-width="1.2" opacity=".45" />
+              <circle cx="330" cy="272" r="7" fill="#f4f3ec" />
+
+              <g fill="#708775" opacity=".4">
+                <circle cx="120" cy="120" r="2.5" /><circle cx="540" cy="96" r="2.5" />
+                <circle cx="568" cy="330" r="2.5" /><circle cx="96" cy="330" r="2.5" />
+                <circle cx="500" cy="470" r="2.5" /><circle cx="150" cy="480" r="2.5" />
+              </g>
+            </svg>
+            <p class="cover-note">一座孩子设计的旅馆<br>一堂好奇心驱动的课<br>一次城乡共同的创造</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 活动初衷 -->
+      <section class="slide" data-mark="02" aria-label="活动初衷">
+        <header class="slide-head">
+          <div>
+            <p class="eyebrow reveal">01 / 活动初衷</p>
+            <h2 class="reveal" style="--delay:.14s">自然很近，<span class="accent">观察</span>却很远。</h2>
+          </div>
+          <div class="deck-label reveal" style="--delay:.2s">从“知道答案”回到“提出问题”</div>
+        </header>
+
+        <div class="intent-grid">
+          <article class="intent-panel panel reveal" style="--delay:.18s">
+            <span class="panel-label">THE GAP / 学习断点</span>
+            <p class="quote-main">孩子在课本里认识昆虫，<br>却叫不出校园里<em>一只虫</em>。</p>
+            <p class="body-copy muted">所以我们想为乡村小朋友和城里小朋友，设计一门“好奇自然”课程——让自然教育从身边一次真实的发现开始，对大自然产生更深刻的理解。</p>
+          </article>
+
+          <div class="intent-right">
+            <div class="intent-lead panel reveal" style="--delay:.26s">昆虫旅馆是这门课最好的载体：<strong>方便搭建、住户多样、场景丰富、便于比较。</strong></div>
+            <div class="intent-points">
+              <article class="micro-card panel reveal" style="--delay:.32s">
+                <span class="mc-key">SEE</span>
+                <div><strong>看见身边自然</strong><span>不再路过，而是停下来认真看一只虫</span></div>
+              </article>
+              <article class="micro-card panel reveal" style="--delay:.38s">
+                <span class="mc-key">ASK</span>
+                <div><strong>提出可验证问题</strong><span>从“这是什么”走向“为什么在这里”</span></div>
+              </article>
+              <article class="micro-card panel reveal" style="--delay:.44s">
+                <span class="mc-key">SHARE</span>
+                <div><strong>交流各地发现</strong><span>城乡孩子交换彼此的自然现场</span></div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 课程载体 -->
+      <section class="slide" data-mark="03" aria-label="为什么是昆虫旅馆">
+        <header class="slide-head">
+          <div>
+            <p class="eyebrow reveal">02 / 课程载体</p>
+            <h2 class="reveal" style="--delay:.14s">一座小小的旅馆，<br>装得下<span class="accent">大大的自然</span>。</h2>
+          </div>
+          <div class="deck-label reveal" style="--delay:.2s">昆虫旅馆是“好奇自然”最好的教具</div>
+        </header>
+
+        <div class="carrier-grid">
+          <article class="carrier-card panel reveal" style="--delay:.2s">
+            <span class="carrier-num">01</span>
+            <div>
+              <h3>方便</h3>
+              <p>竹筒、木块、松果皆可成屋。材料随手可得，搭建门槛低，<span class="kw">每个孩子都能动手</span>。</p>
+            </div>
+          </article>
+          <article class="carrier-card panel reveal" style="--delay:.27s">
+            <span class="carrier-num">02</span>
+            <div>
+              <h3>住户多样</h3>
+              <p>独居蜂、瓢虫、草蛉、步甲……一座旅馆可以迎来<span class="kw">很多类型的昆虫</span>，观察素材源源不断。</p>
+            </div>
+          </article>
+          <article class="carrier-card panel reveal" style="--delay:.34s">
+            <span class="carrier-num">03</span>
+            <div>
+              <h3>场景丰富</h3>
+              <p>山地美育村、湿地、农田、校园——旅馆可以布放在<span class="kw">很多种场景</span>，哪里都是课堂。</p>
+            </div>
+          </article>
+          <article class="carrier-card panel reveal" style="--delay:.41s">
+            <span class="carrier-num">04</span>
+            <div>
+              <h3>便于比较</h3>
+              <p>同样的旅馆、不同的地方，谁能入住、何时入住？天然适合<span class="kw">差异化的比较研究</span>。</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- 04 真实硬件 -->
+      <section class="slide" data-mark="04" aria-label="真实硬件">
+        <header class="slide-head">
+          <div>
+            <p class="eyebrow reveal">03 / 真实硬件</p>
+            <h2 class="reveal" style="--delay:.14s">让环境，成为观察的<span class="blue">证据</span>。</h2>
+          </div>
+          <div class="deck-label reveal" style="--delay:.2s">Arduino UNO R3 · DHT11 温湿度 · 光敏电阻</div>
+        </header>
+
+        <div class="hardware-grid">
+          <article class="climate-art panel reveal" style="--delay:.2s">
+            <span class="panel-label">MICROCLIMATE / 微气候感知</span>
+            <svg class="art-svg" viewBox="0 0 600 420" role="img" aria-label="微气候感知抽象图">
+              <g fill="none" stroke="#455f4d">
+                <circle cx="300" cy="205" r="150" stroke-width="1.1" opacity=".45" />
+                <circle cx="300" cy="205" r="110" stroke-width="1" opacity=".35" />
+                <circle cx="300" cy="205" r="70" stroke-width="1" opacity=".28" />
+              </g>
+              <circle cx="300" cy="205" r="22" fill="#455f4d" />
+              <circle cx="300" cy="205" r="6" fill="#f4f3ec" />
+              <g stroke="#708775" stroke-width="1.2" stroke-dasharray="2 7" opacity=".6">
+                <path d="M300 55v-24M300 355v24M150 205h-24M450 205h24" />
+              </g>
+              <g font-family="serif" font-size="17" text-anchor="middle">
+                <circle cx="300" cy="55" r="9" fill="#b7864b" />
+                <text x="300" y="34" fill="#8a6a45">温度</text>
+                <circle cx="450" cy="205" r="9" fill="#66879a" />
+                <text x="450" y="238" fill="#4d666e">湿度</text>
+                <circle cx="150" cy="205" r="9" fill="#a6654d" />
+                <text x="150" y="238" fill="#8a5546">光照</text>
+              </g>
+              <text x="300" y="330" text-anchor="middle" fill="#455f4d" font-family="serif" font-size="18" letter-spacing="3">观察站</text>
+            </svg>
+            <p class="climate-caption">Arduino 通过 USB 连接电脑，持续记录旅馆旁的真实环境——手机负责看见，传感器负责测量，各做擅长的事。</p>
+          </article>
+
+          <div class="data-stack">
+            <article class="data-card panel reveal" style="--delay:.25s"><span class="data-icon">♨</span><span class="data-name">温度</span><strong class="data-value">24.6℃</strong></article>
+            <article class="data-card panel reveal" style="--delay:.32s"><span class="data-icon">◉</span><span class="data-name">湿度</span><strong class="data-value">68%</strong></article>
+            <article class="data-card panel reveal" style="--delay:.39s"><span class="data-icon">☼</span><span class="data-name">相对光照</span><strong class="data-value">720</strong></article>
+            <div class="snapshot-note reveal" style="--delay:.46s"><strong>关键设计：</strong>拍照的一刻，系统自动冻结最近的环境快照。记录的不只是“看到了什么”，还有“在怎样的环境里看到”。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 AI 博物导师 -->
+      <section class="slide" data-mark="05" aria-label="AI博物导师">
+        <header class="slide-head">
+          <div>
+            <p class="eyebrow reveal">04 / AI 博物导师</p>
+            <h2 class="reveal" style="--delay:.14s">AI 不替孩子思考，<br>而是教孩子<span class="accent">继续观察</span>。</h2>
+          </div>
+          <div class="deck-label reveal" style="--delay:.2s">候选 · 依据 · 不确定性 · 下一步</div>
+        </header>
+
+        <div class="ai-grid">
+          <article class="ai-manifesto panel reveal" style="--delay:.2s">
+            <div class="giant">不说<br><span>“确定”</span>。</div>
+            <div class="ai-list">
+              <div><b>01</b><span>最多给出三个可能候选</span></div>
+              <div><b>02</b><span>展示支持证据与反证</span></div>
+              <div><b>03</b><span>明确照片里缺少的细节</span></div>
+              <div><b>04</b><span>给出下一步观察建议</span></div>
+            </div>
+            <p class="ai-note">同一结果提供儿童版与教师版两种讲解；儿童版可由本地语音朗读，无需联网。</p>
+          </article>
+
+          <div class="candidates">
+            <article class="candidate panel reveal" style="--delay:.24s">
+              <span class="candidate-rank">01</span>
+              <div><h3>中华蚱蜢 <span class="muted">· 候选</span></h3><p>绿色体表与粗壮后足相符；仍需观察触角与翅形。</p></div>
+              <span class="status">待核验</span>
+            </article>
+            <article class="candidate panel reveal" style="--delay:.31s">
+              <span class="candidate-rank">02</span>
+              <div><h3>螽斯类 <span class="muted">· 候选</span></h3><p>叶片背面活动特征相似；照片未清楚显示长触角。</p></div>
+              <span class="status">待核验</span>
+            </article>
+            <article class="candidate panel reveal" style="--delay:.38s">
+              <span class="candidate-rank">03</span>
+              <div><h3>叶蝉类 <span class="muted">· 候选</span></h3><p>体色接近环境，但体型与足部特征仍有差异。</p></div>
+              <span class="status">待核验</span>
+            </article>
+            <div class="ai-boundary panel reveal" style="--delay:.45s"><strong>科学边界</strong>　AI 辅助分析，仅供自然教育；不用于权威物种鉴定与安全判断。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 06 融合架构 -->
+      <section class="slide" data-mark="06" aria-label="硬件软件云端融合">
+        <header class="slide-head">
+          <div>
+            <p class="eyebrow reveal">05 / 融合</p>
+            <h2 class="reveal" style="--delay:.14s">硬件、小程序与云端 AI，<br>各做<span class="accent">擅长的事</span>。</h2>
+          </div>
+          <div class="deck-label reveal" style="--delay:.2s">一次观察的完整旅程</div>
+        </header>
+
+        <div class="fusion-wrap">
+          <div class="fusion-flow">
+            <article class="f-node panel reveal" style="--delay:.2s">
+              <span class="f-orb">感</span>
+              <h3>昆虫旅馆 × Arduino</h3>
+              <p>DHT11 温湿度与光敏电阻，持续记录旅馆旁的微气候。</p>
+            </article>
+            <span class="f-arrow reveal" style="--delay:.26s">→</span>
+            <article class="f-node panel reveal" style="--delay:.3s">
+              <span class="f-orb">存</span>
+              <h3>本地服务</h3>
+              <p>串口桥接、数据校验与保存，观察记录不因断网丢失。</p>
+            </article>
+            <span class="f-arrow reveal" style="--delay:.36s">→</span>
+            <article class="f-node panel reveal" style="--delay:.4s">
+              <span class="f-orb">观</span>
+              <h3>微信小程序</h3>
+              <p>孩子拍照、描述、听讲解，并生成自己的作品。</p>
+            </article>
+            <span class="f-arrow reveal" style="--delay:.46s">→</span>
+            <article class="f-node panel reveal" style="--delay:.5s">
+              <span class="f-orb">智</span>
+              <h3>云端 AI</h3>
+              <p>Kimi 多模态候选分析，生成讲解文字与无文字插画。</p>
+            </article>
+          </div>
+
+          <div class="fusion-outputs panel reveal" style="--delay:.56s">
+            <span class="panel-label">OUTPUT / 一次观察的产出</span>
+            <div class="output-chips">
+              <span>自然明信片</span>
+              <span>博物详解图</span>
+              <span>儿童语音讲解</span>
+              <span>自然中国交流广场</span>
+            </div>
+          </div>
+
+          <div class="fusion-note reveal" style="--delay:.62s"><strong>可靠兜底：</strong>设备或网络不可用时，已采集的观察记录不丢失，可切换到明确标注的“演示模式”完成流程。</div>
+        </div>
+      </section>
+
+      <!-- 07 自然来信 -->
+      <section class="slide" data-mark="07" aria-label="自然明信片">
+        <header class="slide-head">
+          <div>
+            <p class="eyebrow reveal">06 / 自然来信</p>
+            <h2 class="reveal" style="--delay:.14s">把一次发现，<br>变成一封<span class="accent">自然来信</span>。</h2>
+          </div>
+          <div class="deck-label reveal" style="--delay:.2s">观察不是终点，表达让学习真正完成</div>
+        </header>
+
+        <div class="pc-grid">
+          <article class="pc-card panel reveal" style="--delay:.22s">
+            <div class="pc-art">
+              <svg class="art-svg" viewBox="0 0 460 300" role="img" aria-label="自然来信抽象图形">
+                <circle cx="230" cy="150" r="118" fill="none" stroke="#708775" stroke-width="1.5" stroke-dasharray="4 9" opacity=".6" />
+                <circle cx="230" cy="150" r="80" fill="none" stroke="#708775" stroke-width="1.5" opacity=".45" />
+                <circle cx="230" cy="150" r="34" fill="#a6654d" opacity=".9" />
+                <circle cx="230" cy="150" r="12" fill="#f4f3ec" />
+                <path d="M118 96A118 118 0 0 1 322 76" fill="none" stroke="#b7864b" stroke-width="3" stroke-linecap="round" />
+                <path d="M342 204A118 118 0 0 1 138 224" fill="none" stroke="#66879a" stroke-width="3" stroke-linecap="round" opacity=".85" />
+                <circle cx="118" cy="96" r="6" fill="#b7864b" />
+                <circle cx="342" cy="204" r="6" fill="#66879a" />
+                <circle cx="150" cy="60" r="3.5" fill="#455f4d" opacity=".5" />
+                <circle cx="318" cy="238" r="3.5" fill="#455f4d" opacity=".5" />
+                <circle cx="346" cy="118" r="3" fill="#a6654d" opacity=".55" />
+              </svg>
+              <div class="pc-stamp">虫宿<br>博物志</div>
+            </div>
+            <div class="pc-info">
+              <span class="panel-label">NATURE POSTCARD / 观察编号 016</span>
+              <h3>叶片上的访客</h3>
+              <p>发现地点：校园花坛</p>
+              <p>观察描述：红色鞘翅，背部有黑色斑点。</p>
+              <p>状态：候选 · 待继续观察</p>
+              <div class="pc-data"><span>24.6℃</span><span>68%</span><span>中等光照</span></div>
+            </div>
+          </article>
+
+          <div class="pc-copy">
+            <p class="lead reveal" style="--delay:.25s">照片、数据、科普与孩子的描述，<br>在同一张作品里相遇。</p>
+            <div class="pc-list">
+              <div class="pc-item panel reveal" style="--delay:.32s"><b>照</b><span>保留真实观察照片</span></div>
+              <div class="pc-item panel reveal" style="--delay:.38s"><b>数</b><span>带上当时的环境快照</span></div>
+              <div class="pc-item panel reveal" style="--delay:.44s"><b>知</b><span>呈现谨慎、可核验的科普</span></div>
+              <div class="pc-item panel reveal" style="--delay:.50s"><b>寄</b><span>保存、分享，成为自然档案</span></div>
+            </div>
+            <p class="pc-note reveal" style="--delay:.56s">这封「自然来信」，就是城乡孩子之间互相交换的东西。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 08 城乡共学 -->
+      <section class="slide" data-mark="08" aria-label="城乡共学">
+        <header class="slide-head">
+          <div>
+            <p class="eyebrow reveal">07 / 城乡共学</p>
+            <h2 class="reveal" style="--delay:.14s">让城乡孩子，<br>共写<span class="accent">自然中国</span>。</h2>
+          </div>
+          <div class="deck-label reveal" style="--delay:.2s">同一种好奇心，看见不同的生态现场</div>
+        </header>
+
+        <div class="co-grid">
+          <article class="co-map panel reveal" style="--delay:.2s">
+            <p class="co-quote">“你们那里的昆虫，<br>也喜欢这样的环境吗？”</p>
+            <div class="co-svg-wrap">
+              <svg class="art-svg" viewBox="0 0 700 400" role="img" aria-label="城乡交换抽象图">
+                <g fill="none" stroke="#a8b7a8" stroke-width="1" opacity=".5">
+                  <path d="M-20 330C120 260 260 250 380 300c120 50 240 44 340-6" />
+                  <path d="M-20 360C130 295 270 285 390 330c110 42 220 40 330-4" />
+                  <path d="M-20 388C140 330 280 320 400 358c100 32 200 32 320-2" />
+                </g>
+
+                <path d="M205 190C300 90 400 90 495 190" fill="none" stroke="#a6654d" stroke-width="2.5" stroke-dasharray="7 9" />
+                <path fill="#a6654d" d="m488 176 22 26-34-5Z" />
+                <path d="M495 226C400 320 300 320 205 226" fill="none" stroke="#66879a" stroke-width="2.5" stroke-dasharray="7 9" opacity=".85" />
+                <path fill="#66879a" d="m212 240-22-26 34 5Z" opacity=".85" />
+
+                <rect x="338" y="122" width="18" height="12" rx="2" fill="#eee8d8" stroke="#455f4d" stroke-width="1.2" transform="rotate(-14 347 128)" />
+                <rect x="346" y="262" width="18" height="12" rx="2" fill="#dde5e6" stroke="#66879a" stroke-width="1.2" transform="rotate(12 355 268)" />
+
+                <g transform="translate(140 208)">
+                  <circle r="64" fill="none" stroke="#66879a" stroke-width="1.6" opacity=".8" />
+                  <circle r="46" fill="none" stroke="#66879a" stroke-width="1" opacity=".4" />
+                  <circle r="16" fill="#66879a" />
+                  <text y="98" text-anchor="middle" fill="#4d666e" font-family="serif" font-size="19" letter-spacing="4">城市校园</text>
+                </g>
+
+                <g transform="translate(560 208)">
+                  <circle r="64" fill="none" stroke="#455f4d" stroke-width="1.6" opacity=".85" />
+                  <circle r="46" fill="none" stroke="#455f4d" stroke-width="1" opacity=".4" />
+                  <circle r="16" fill="#455f4d" />
+                  <text y="98" text-anchor="middle" fill="#455f4d" font-family="serif" font-size="19" letter-spacing="4">乡村校园</text>
+                </g>
+
+                <g fill="#708775" opacity=".4">
+                  <circle cx="60" cy="80" r="2.5" /><circle cx="640" cy="70" r="2.5" />
+                  <circle cx="350" cy="60" r="2.5" /><circle cx="90" cy="350" r="2.5" />
+                  <circle cx="620" cy="345" r="2.5" />
+                </g>
+              </svg>
+            </div>
+          </article>
+
+          <div class="co-right">
+            <div class="co-lead panel reveal" style="--delay:.25s">孩子交换的不只是明信片。<strong>他们在比较不同地方的温度、湿度、生境与生命。</strong></div>
+            <div class="scenes">
+              <article class="scene panel reveal" style="--delay:.31s"><span class="num">01</span><h3>山家美育村</h3><p>林缘、溪流与山谷温差</p></article>
+              <article class="scene panel reveal" style="--delay:.37s"><span class="num">02</span><h3>西海湿地</h3><p>水边植物与高湿环境</p></article>
+              <article class="scene panel reveal" style="--delay:.43s"><span class="num">03</span><h3>农机站农田</h3><p>作物、田埂与季节变化</p></article>
+              <article class="scene panel reveal" style="--delay:.49s"><span class="num">04</span><h3>城市校园</h3><p>从身边绿地开始持续观察</p></article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 09 未来期望 -->
+      <section class="slide" data-mark="09" aria-label="未来期望">
+        <header class="slide-head">
+          <div>
+            <p class="eyebrow reveal">08 / 未来期望</p>
+            <h2 class="reveal" style="--delay:.14s">旅馆还会长大，<br>好奇心也是<span class="accent">。</span></h2>
+          </div>
+          <div class="deck-label reveal" style="--delay:.2s">下一代智能昆虫旅馆的想象</div>
+        </header>
+
+        <div class="future-grid">
+          <article class="future-card panel reveal" style="--delay:.2s">
+            <span class="f-tag">INVITE / 更温柔的邀请</span>
+            <h3>信息素与天然诱芯</h3>
+            <p>未来尝试用<span class="kw">信息素、花粉与食物诱芯</span>等方式，礼貌地邀请更多类型的昆虫来做客，而不是捕捉它们。</p>
+          </article>
+          <article class="future-card panel reveal" style="--delay:.27s">
+            <span class="f-tag">FREE / 自由进出</span>
+            <h3>来去自由的旅馆</h3>
+            <p>旅馆永远敞开，<span class="kw">不困住任何一只虫子</span>。自由来去的住客，才是真正可持续的观察对象。</p>
+          </article>
+          <article class="future-card panel reveal" style="--delay:.34s">
+            <span class="f-tag">SENSE / 更丰富的感知</span>
+            <h3>听见、看见微气候</h3>
+            <p>在温度、湿度与光照之外，未来加入<span class="kw">声音与低功耗影像</span>，让孩子读到更完整的自然现场。</p>
+          </article>
+          <article class="future-card panel reveal" style="--delay:.41s">
+            <span class="f-tag">ATLAS / 共同的年鉴</span>
+            <h3>汇成自然中国年鉴</h3>
+            <p>把不同地区、不同季节的观察汇聚起来，成为城乡孩子<span class="kw">共同书写的自然年鉴</span>。</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- 10 结尾 -->
+      <section class="slide" data-mark="10" aria-label="结尾">
+        <div class="final-grid">
+          <div>
+            <p class="eyebrow reveal">09 / 我们相信</p>
+            <div class="final-title reveal" style="--delay:.14s"><span class="small">从一只小生命开始</span>重新认识<br>身边的自然。</div>
+            <p class="final-copy reveal" style="--delay:.27s">人工智能不只是替孩子给答案，<br>更应该带着孩子去观察、记录、提问和交流。</p>
+          </div>
+
+          <div class="final-art reveal" style="--delay:.2s">
+            <svg class="art-svg" viewBox="0 0 620 560" role="img" aria-label="山谷涟漪抽象图形">
+              <defs>
+                <radialGradient id="halo2" cx="50%" cy="55%" r="55%">
+                  <stop offset="0%" stop-color="#c9d6c7" stop-opacity=".8" />
+                  <stop offset="75%" stop-color="#d8e0d4" stop-opacity=".35" />
+                  <stop offset="100%" stop-color="#d8e0d4" stop-opacity="0" />
+                </radialGradient>
+              </defs>
+
+              <circle cx="310" cy="300" r="240" fill="url(#halo2)" />
+
+              <g fill="none" stroke="#455f4d">
+                <path d="M110 430a200 200 0 0 1 400 0" stroke-width="1.2" opacity=".5" />
+                <path d="M160 430a150 150 0 0 1 300 0" stroke-width="1.1" opacity=".4" />
+                <path d="M210 430a100 100 0 0 1 200 0" stroke-width="1" opacity=".32" />
+                <path d="M262 430a48 48 0 0 1 96 0" stroke-width="1" opacity=".26" />
+              </g>
+
+              <path d="M40 430h540" stroke="#708775" stroke-width="1.2" opacity=".55" />
+              <g stroke="#708775" stroke-width="1.2" opacity=".45">
+                <path d="M100 430v10M190 430v10M280 430v10M370 430v10M460 430v10M540 430v10" />
+              </g>
+
+              <circle cx="310" cy="296" r="34" fill="#b7864b" />
+              <circle cx="310" cy="296" r="50" fill="none" stroke="#b7864b" stroke-width="1.4" opacity=".45" />
+              <path d="M310 366v-236" stroke="#a6654d" stroke-width="1.4" stroke-dasharray="2 9" opacity=".7" />
+              <circle cx="310" cy="108" r="5" fill="#a6654d" />
+
+              <g>
+                <circle cx="180" cy="180" r="7" fill="#455f4d" opacity=".85" />
+                <circle cx="452" cy="160" r="6" fill="#66879a" opacity=".9" />
+                <circle cx="508" cy="268" r="5" fill="#a6654d" opacity=".85" />
+                <circle cx="128" cy="286" r="5" fill="#b7864b" opacity=".85" />
+                <circle cx="228" cy="96" r="4" fill="#708775" opacity=".8" />
+                <circle cx="410" cy="80" r="4" fill="#708775" opacity=".8" />
+              </g>
+
+              <g fill="none" stroke="#708775" stroke-width="1" opacity=".5">
+                <circle cx="180" cy="180" r="13" />
+                <circle cx="452" cy="160" r="11" />
+                <circle cx="508" cy="268" r="9" />
+                <circle cx="128" cy="286" r="9" />
+              </g>
+            </svg>
+            <div class="final-badges">
+              <div class="final-badge">博物教育 · 从一只虫开始的完整探究</div>
+              <div class="final-badge">城乡共创 · 用明信片交换彼此的自然</div>
+              <div class="final-badge">虫宿博物志 · BugAtlas-China</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <nav class="nav-dotlist" id="navDots" aria-label="幻灯片导航"></nav>
+
+      <div class="controls" aria-label="播放控制">
+        <button class="control-btn" id="prevBtn" type="button" aria-label="上一页" title="上一页（←）">←</button>
+        <div class="counter"><span id="currentIndex">01</span> / <span id="totalCount">11</span></div>
+        <button class="control-btn" id="nextBtn" type="button" aria-label="下一页" title="下一页（→）">→</button>
+        <button class="control-btn" id="fullscreenBtn" type="button" aria-label="全屏" title="全屏（F）">⛶</button>
+      </div>
+
+      <div class="side-hint">← → 翻页　·　F 全屏　·　Home / End</div>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll('.slide')];
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const fullscreenBtn = document.getElementById('fullscreenBtn');
+      const currentIndex = document.getElementById('currentIndex');
+      const totalCount = document.getElementById('totalCount');
+      const progressBar = document.getElementById('progressBar');
+      const navDots = document.getElementById('navDots');
+      let index = Math.max(0, Math.min(slides.length - 1, Number(location.hash.slice(1)) - 1 || 0));
+      let wheelLocked = false;
+      let touchStartX = 0;
+
+      totalCount.textContent = String(slides.length).padStart(2, '0');
+
+      slides.forEach((slide, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'nav-dot';
+        dot.type = 'button';
+        dot.setAttribute('aria-label', `跳转到第 ${i + 1} 页`);
+        dot.addEventListener('click', () => show(i));
+        navDots.appendChild(dot);
+      });
+
+      const dots = [...navDots.children];
+
+      function show(next) {
+        const target = Math.max(0, Math.min(slides.length - 1, next));
+        if (target === index && slides[target].classList.contains('active')) return;
+        const direction = target > index ? 1 : -1;
+        slides.forEach((slide, i) => {
+          slide.classList.toggle('leaving-left', i === index && direction > 0);
+          slide.classList.toggle('active', i === target);
+          slide.setAttribute('aria-hidden', i === target ? 'false' : 'true');
+        });
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === target));
+        index = target;
+        currentIndex.textContent = String(index + 1).padStart(2, '0');
+        progressBar.style.width = `${((index + 1) / slides.length) * 100}%`;
+        history.replaceState(null, '', `#${index + 1}`);
+      }
+
+      function next() { show(index + 1); }
+      function prev() { show(index - 1); }
+
+      prevBtn.addEventListener('click', prev);
+      nextBtn.addEventListener('click', next);
+      fullscreenBtn.addEventListener('click', async () => {
+        try {
+          if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+          else await document.exitFullscreen();
+        } catch (_) {}
+      });
+
+      document.addEventListener('keydown', event => {
+        if (['ArrowRight', 'PageDown', 'Enter', ' '].includes(event.key)) { event.preventDefault(); next(); }
+        if (['ArrowLeft', 'PageUp', 'Backspace'].includes(event.key)) { event.preventDefault(); prev(); }
+        if (event.key === 'Home') { event.preventDefault(); show(0); }
+        if (event.key === 'End') { event.preventDefault(); show(slides.length - 1); }
+        if (event.key.toLowerCase() === 'f') fullscreenBtn.click();
+      });
+
+      document.addEventListener('wheel', event => {
+        if (wheelLocked || Math.abs(event.deltaY) < 18) return;
+        wheelLocked = true;
+        event.deltaY > 0 ? next() : prev();
+        window.setTimeout(() => { wheelLocked = false; }, 650);
+      }, { passive: true });
+
+      document.addEventListener('touchstart', event => {
+        touchStartX = event.changedTouches[0].clientX;
+      }, { passive: true });
+
+      document.addEventListener('touchend', event => {
+        const delta = event.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(delta) > 45) delta < 0 ? next() : prev();
+      }, { passive: true });
+
+      window.addEventListener('hashchange', () => {
+        const target = Number(location.hash.slice(1)) - 1;
+        if (Number.isFinite(target)) show(target);
+      });
+
+      slides.forEach((slide, i) => slide.setAttribute('aria-hidden', i === index ? 'false' : 'true'));
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+      currentIndex.textContent = String(index + 1).padStart(2, '0');
+      progressBar.style.width = `${((index + 1) / slides.length) * 100}%`;
+    })();
+  </script>
+</body>
+</html>
